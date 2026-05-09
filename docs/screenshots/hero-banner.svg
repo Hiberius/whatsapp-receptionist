@@ -66,20 +66,20 @@
     <!-- chips -->
     <g font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="500" letter-spacing="0.4">
       <g>
-        <rect x="80" y="468" width="98" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
-        <text x="129" y="488" text-anchor="middle" fill="#0F4F4A">Next.js 15</text>
+        <rect x="80" y="468" width="92" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+        <text x="126" y="488" text-anchor="middle" fill="#0F4F4A">Next.js 15</text>
       </g>
       <g>
-        <rect x="188" y="468" width="98" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
-        <text x="237" y="488" text-anchor="middle" fill="#0F4F4A">Claude 4.5</text>
+        <rect x="182" y="468" width="120" height="32" rx="16" fill="#0F4F4A"/>
+        <text x="242" y="488" text-anchor="middle" fill="#F5F1E8">Opus 4.7 Max</text>
       </g>
       <g>
-        <rect x="296" y="468" width="98" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
-        <text x="345" y="488" text-anchor="middle" fill="#0F4F4A">Supabase</text>
+        <rect x="312" y="468" width="86" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+        <text x="355" y="488" text-anchor="middle" fill="#0F4F4A">Supabase</text>
       </g>
       <g>
-        <rect x="404" y="468" width="98" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
-        <text x="453" y="488" text-anchor="middle" fill="#0F4F4A">GDPR-ready</text>
+        <rect x="408" y="468" width="100" height="32" rx="16" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+        <text x="458" y="488" text-anchor="middle" fill="#0F4F4A">GDPR-ready</text>
       </g>
     </g>
 
