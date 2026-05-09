@@ -35,8 +35,9 @@
     <!-- Free / Self-host -->
     <rect width="300" height="380" rx="20" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
     <text x="30" y="60" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#5C6B68">SELF-HOSTED</text>
-    <text x="30" y="100" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#0F4F4A">€0</text>
-    <text x="30" y="124" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">forever · MIT license</text>
+    <text x="30" y="104" font-family="Fraunces, Georgia, serif" font-size="44" font-weight="600" fill="#0F4F4A">€0</text>
+    <text x="100" y="104" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5C6B68">forever</text>
+    <text x="30" y="132" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">MIT license · self-host</text>
     <line x1="30" y1="150" x2="270" y2="150" stroke="#E5E2D6" stroke-width="1"/>
     <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#2A3938">
       <text x="30" y="180">✓  Codice open source completo</text>
@@ -53,12 +54,12 @@
   <!-- Pro (highlighted) -->
   <g transform="translate(490 320)">
     <rect width="300" height="400" rx="20" fill="#0F4F4A"/>
-    <rect x="30" y="-1" width="80" height="24" rx="12" fill="#E8C56A"/>
-    <text x="70" y="14" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#0F4F4A" text-anchor="middle">POPOLARE</text>
+    <rect x="30" y="-12" width="92" height="24" rx="12" fill="#E8C56A"/>
+    <text x="76" y="4" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#0F4F4A" text-anchor="middle" dominant-baseline="middle">POPOLARE</text>
     <text x="30" y="80" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#E8C56A">PRO CLOUD</text>
-    <text x="30" y="120" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#F5F1E8">€89</text>
-    <text x="100" y="120" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8">/mese</text>
-    <text x="30" y="144" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#F5F1E8" opacity="0.7">fino a 1.500 conversazioni/mese</text>
+    <text x="30" y="124" font-family="Fraunces, Georgia, serif" font-size="44" font-weight="600" fill="#F5F1E8">€89</text>
+    <text x="148" y="124" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8" opacity="0.85">/mese</text>
+    <text x="30" y="152" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#F5F1E8" opacity="0.7">fino a 1.500 conversazioni/mese</text>
     <line x1="30" y1="170" x2="270" y2="170" stroke="#F5F1E8" stroke-width="1" opacity="0.2"/>
     <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#F5F1E8">
       <text x="30" y="200">✓  Tutto Self-Hosted, gestito da noi</text>
@@ -76,8 +77,8 @@
   <g transform="translate(820 340)">
     <rect width="300" height="380" rx="20" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
     <text x="30" y="60" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#5C6B68">ENTERPRISE</text>
-    <text x="30" y="100" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#0F4F4A">Custom</text>
-    <text x="30" y="124" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">white-label · SLA · DPA</text>
+    <text x="30" y="104" font-family="Fraunces, Georgia, serif" font-size="44" font-weight="600" fill="#0F4F4A">Custom</text>
+    <text x="30" y="132" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">white-label · SLA · DPA</text>
     <line x1="30" y1="150" x2="270" y2="150" stroke="#E5E2D6" stroke-width="1"/>
     <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#2A3938">
       <text x="30" y="180">✓  Tutto Pro, scalato a te</text>
