@@ -11,7 +11,7 @@
 [![Built with Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
-[![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Sonnet%204.5-D97757?logo=anthropic)](https://anthropic.com)
+[![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Opus%204.7%20Max-D97757?logo=anthropic)](https://anthropic.com)
 [![Tests](https://img.shields.io/badge/test-369%20passing-brightgreen)](#qualità)
 [![GDPR](https://img.shields.io/badge/GDPR-ready-2563eb)](#gdpr--sicurezza)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
@@ -60,7 +60,7 @@ Non è una demo, non è un tutorial. È uno starter kit SaaS completo, pronto pe
 | Linguaggio | **TypeScript 5.9 strict** | `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, zero `any` in src |
 | Database | **Supabase Postgres EU** + **Drizzle ORM** | Postgres gestito a Francoforte, migrazioni type-safe, RLS nativo |
 | Auth | **Supabase Auth** | Cookie httpOnly + secure + sameSite=lax, sessione SSR-aware |
-| AI | **Anthropic Claude Sonnet 4.5** | Tool use migliore in classe, prompt caching, latenza prevedibile |
+| AI | **Anthropic Claude Opus 4.7 Max** | Tool use migliore in classe, prompt caching, latenza prevedibile |
 | Voce | **ElevenLabs STT + TTS** | La qualità della voce italiana conta — ElevenLabs la fa bene |
 | Messaggistica | **Meta WhatsApp Cloud API** | Solo ufficiale. Niente Baileys, niente client scraped. |
 | Calendario | **Google Calendar OAuth** | Token cifrati, conflict detection, multi-calendar |
@@ -225,7 +225,7 @@ Per contributor non-Claude: il codebase è TypeScript strict, ESLint 9 flat, Pre
 
 ## Ringraziamenti
 
-- [Anthropic](https://anthropic.com) per Claude Sonnet 4.5 — metà di questo codice è scritta in pair con Claude Code
+- [Anthropic](https://anthropic.com) per Claude Opus 4.7 Max — metà di questo codice è scritta in pair con Claude Code
 - [Supabase](https://supabase.com) per aver reso il multi-tenant Postgres + RLS banale
 - [Vercel](https://vercel.com) per Next.js
 - [ElevenLabs](https://elevenlabs.io) per la voce italiana che non sembra robotica
