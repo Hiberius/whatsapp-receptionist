@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1,
+    "slug": "hero-always-on-reception",
+    "title": "Segreteria sempre attiva",
+    "recommendedUse": "Hero principale o hero alternativo",
+    "alt": "Assistente AI Ambrogio che gestisce messaggi e appuntamenti anche fuori orario",
+    "svg": "public/assets/site-images/ambrogio/svg/01-hero-always-on-reception.svg",
+    "png": "public/assets/site-images/ambrogio/png/01-hero-always-on-reception.png",
+    "webp": "public/assets/site-images/ambrogio/webp/01-hero-always-on-reception.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 2,
+    "slug": "whatsapp-voice-transcript",
+    "title": "Vocali WhatsApp trascritti",
+    "recommendedUse": "Sezione vocali ed ElevenLabs",
+    "alt": "Messaggio vocale WhatsApp trasformato in testo e risposta di Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/02-whatsapp-voice-transcript.svg",
+    "png": "public/assets/site-images/ambrogio/png/02-whatsapp-voice-transcript.png",
+    "webp": "public/assets/site-images/ambrogio/webp/02-whatsapp-voice-transcript.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 3,
+    "slug": "calendar-booking-flow",
+    "title": "Prenotazione automatica",
+    "recommendedUse": "Come funziona, booking, Google Calendar",
+    "alt": "Flusso visuale da messaggio WhatsApp a slot calendario prenotato",
+    "svg": "public/assets/site-images/ambrogio/svg/03-calendar-booking-flow.svg",
+    "png": "public/assets/site-images/ambrogio/png/03-calendar-booking-flow.png",
+    "webp": "public/assets/site-images/ambrogio/webp/03-calendar-booking-flow.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 4,
+    "slug": "human-escalation",
+    "title": "Escalation umana",
+    "recommendedUse": "Trust, sicurezza operativa, casi delicati",
+    "alt": "Ambrogio passa una conversazione delicata a un operatore umano",
+    "svg": "public/assets/site-images/ambrogio/svg/04-human-escalation.svg",
+    "png": "public/assets/site-images/ambrogio/png/04-human-escalation.png",
+    "webp": "public/assets/site-images/ambrogio/webp/04-human-escalation.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 5,
+    "slug": "privacy-vault",
+    "title": "Privacy e DPA",
+    "recommendedUse": "Trust band, legal, security",
+    "alt": "Dati cliente protetti in un vault privacy-first con audit log",
+    "svg": "public/assets/site-images/ambrogio/svg/05-privacy-vault.svg",
+    "png": "public/assets/site-images/ambrogio/png/05-privacy-vault.png",
+    "webp": "public/assets/site-images/ambrogio/webp/05-privacy-vault.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 6,
+    "slug": "vertical-dental",
+    "title": "Studio dentistico",
+    "recommendedUse": "Verticali: dentisti",
+    "alt": "Studio dentistico con prenotazioni WhatsApp gestite da Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/06-vertical-dental.svg",
+    "png": "public/assets/site-images/ambrogio/png/06-vertical-dental.png",
+    "webp": "public/assets/site-images/ambrogio/webp/06-vertical-dental.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 7,
+    "slug": "vertical-beauty",
+    "title": "Centro estetico",
+    "recommendedUse": "Verticali: estetica e beauty",
+    "alt": "Centro estetico con messaggi e appuntamenti automatizzati",
+    "svg": "public/assets/site-images/ambrogio/svg/07-vertical-beauty.svg",
+    "png": "public/assets/site-images/ambrogio/png/07-vertical-beauty.png",
+    "webp": "public/assets/site-images/ambrogio/webp/07-vertical-beauty.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 8,
+    "slug": "vertical-fitness",
+    "title": "Palestra e pilates",
+    "recommendedUse": "Verticali: fitness, palestre, pilates",
+    "alt": "Studio fitness con calendario lezioni e richieste WhatsApp",
+    "svg": "public/assets/site-images/ambrogio/svg/08-vertical-fitness.svg",
+    "png": "public/assets/site-images/ambrogio/png/08-vertical-fitness.png",
+    "webp": "public/assets/site-images/ambrogio/webp/08-vertical-fitness.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 9,
+    "slug": "vertical-professional-office",
+    "title": "Studio professionale",
+    "recommendedUse": "Verticali: consulenti e studi professionali",
+    "alt": "Studio professionale con front desk AI e documenti organizzati",
+    "svg": "public/assets/site-images/ambrogio/svg/09-vertical-professional-office.svg",
+    "png": "public/assets/site-images/ambrogio/png/09-vertical-professional-office.png",
+    "webp": "public/assets/site-images/ambrogio/webp/09-vertical-professional-office.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 10,
+    "slug": "multi-channel-orbit",
+    "title": "Canali collegati",
+    "recommendedUse": "Sezione prodotto e integrazioni",
+    "alt": "WhatsApp, DM, chat e calendario collegati intorno ad Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/10-multi-channel-orbit.svg",
+    "png": "public/assets/site-images/ambrogio/png/10-multi-channel-orbit.png",
+    "webp": "public/assets/site-images/ambrogio/webp/10-multi-channel-orbit.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 11,
+    "slug": "dashboard-command-center",
+    "title": "Dashboard operativa",
+    "recommendedUse": "Dashboard preview",
+    "alt": "Dashboard Ambrogio con conversazioni, appuntamenti e metriche",
+    "svg": "public/assets/site-images/ambrogio/svg/11-dashboard-command-center.svg",
+    "png": "public/assets/site-images/ambrogio/png/11-dashboard-command-center.png",
+    "webp": "public/assets/site-images/ambrogio/webp/11-dashboard-command-center.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 12,
+    "slug": "roi-calculator",
+    "title": "ROI calculator",
+    "recommendedUse": "Sezione ROI e pricing",
+    "alt": "Calcolo ritorno economico degli appuntamenti recuperati con Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/12-roi-calculator.svg",
+    "png": "public/assets/site-images/ambrogio/png/12-roi-calculator.png",
+    "webp": "public/assets/site-images/ambrogio/webp/12-roi-calculator.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 13,
+    "slug": "onboarding-three-steps",
+    "title": "Onboarding in tre step",
+    "recommendedUse": "Come funziona e onboarding",
+    "alt": "Connetti WhatsApp, configura FAQ e vai live con Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/13-onboarding-three-steps.svg",
+    "png": "public/assets/site-images/ambrogio/png/13-onboarding-three-steps.png",
+    "webp": "public/assets/site-images/ambrogio/webp/13-onboarding-three-steps.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 14,
+    "slug": "night-to-morning-bookings",
+    "title": "Da notte ad appuntamenti",
+    "recommendedUse": "Prima/Dopo, hero storytelling",
+    "alt": "Richieste arrivate di notte diventano appuntamenti confermati al mattino",
+    "svg": "public/assets/site-images/ambrogio/svg/14-night-to-morning-bookings.svg",
+    "png": "public/assets/site-images/ambrogio/png/14-night-to-morning-bookings.png",
+    "webp": "public/assets/site-images/ambrogio/webp/14-night-to-morning-bookings.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 15,
+    "slug": "voice-personality",
+    "title": "Voce naturale",
+    "recommendedUse": "Voice AI e risposte vocali",
+    "alt": "Voce AI naturale per risposte vocali WhatsApp opzionali",
+    "svg": "public/assets/site-images/ambrogio/svg/15-voice-personality.svg",
+    "png": "public/assets/site-images/ambrogio/png/15-voice-personality.png",
+    "webp": "public/assets/site-images/ambrogio/webp/15-voice-personality.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 16,
+    "slug": "knowledge-base",
+    "title": "Knowledge base",
+    "recommendedUse": "AI engine, FAQ, configurazione",
+    "alt": "FAQ, servizi e orari trasformati in knowledge base per Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/16-knowledge-base.svg",
+    "png": "public/assets/site-images/ambrogio/png/16-knowledge-base.png",
+    "webp": "public/assets/site-images/ambrogio/webp/16-knowledge-base.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 17,
+    "slug": "agency-white-label",
+    "title": "White-label agenzie",
+    "recommendedUse": "Pagina Per Agenzie",
+    "alt": "Agenzia che gestisce piu' clienti white-label con Ambrogio",
+    "svg": "public/assets/site-images/ambrogio/svg/17-agency-white-label.svg",
+    "png": "public/assets/site-images/ambrogio/png/17-agency-white-label.png",
+    "webp": "public/assets/site-images/ambrogio/webp/17-agency-white-label.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 18,
+    "slug": "webhook-infrastructure",
+    "title": "Infrastruttura webhook",
+    "recommendedUse": "Tech/security page, blog tecnico",
+    "alt": "Webhook WhatsApp, database e AI engine collegati in modo sicuro",
+    "svg": "public/assets/site-images/ambrogio/svg/18-webhook-infrastructure.svg",
+    "png": "public/assets/site-images/ambrogio/png/18-webhook-infrastructure.png",
+    "webp": "public/assets/site-images/ambrogio/webp/18-webhook-infrastructure.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 19,
+    "slug": "fair-use-pricing",
+    "title": "Prezzi e fair use",
+    "recommendedUse": "Pricing, FAQ costi WhatsApp",
+    "alt": "Metriche di utilizzo, fair use e costi provider chiari",
+    "svg": "public/assets/site-images/ambrogio/svg/19-fair-use-pricing.svg",
+    "png": "public/assets/site-images/ambrogio/png/19-fair-use-pricing.png",
+    "webp": "public/assets/site-images/ambrogio/webp/19-fair-use-pricing.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  },
+  {
+    "id": 20,
+    "slug": "italy-beta-pilot",
+    "title": "Beta studi italiani",
+    "recommendedUse": "Social proof beta e sezione pilota",
+    "alt": "Studi pilota italiani collegati ad Ambrogio.ai",
+    "svg": "public/assets/site-images/ambrogio/svg/20-italy-beta-pilot.svg",
+    "png": "public/assets/site-images/ambrogio/png/20-italy-beta-pilot.png",
+    "webp": "public/assets/site-images/ambrogio/webp/20-italy-beta-pilot.webp",
+    "dimensions": {
+      "width": 1600,
+      "height": 1000,
+      "aspectRatio": "16:10"
+    }
+  }
+]

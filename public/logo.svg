@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" role="img" aria-label="WhatsApp Receptionist logo">
+  <title>WhatsApp Receptionist</title>
+  <defs>
+    <linearGradient id="logo-bg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F4F4A"/>
+      <stop offset="1" stop-color="#1A6F68"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon -->
+  <g transform="translate(6 6)">
+    <rect width="48" height="48" rx="11" fill="url(#logo-bg)"/>
+    <path d="M12 16 a6 6 0 0 1 6 -6 h12 a6 6 0 0 1 6 6 v8 a6 6 0 0 1 -6 6 h-9 l-6 5 v-5 a6 6 0 0 1 -3 -5 z"
+          fill="none" stroke="#F5F1E8" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="19" cy="20" r="1.5" fill="#F5F1E8"/>
+    <circle cx="24" cy="20" r="1.5" fill="#F5F1E8" opacity="0.7"/>
+    <circle cx="29" cy="20" r="1.5" fill="#F5F1E8" opacity="0.4"/>
+    <path d="M33 10 l1 2 l2 1 l-2 1 l-1 2 l-1 -2 l-2 -1 l2 -1 z" fill="#E8C56A"/>
+  </g>
+  <!-- Wordmark -->
+  <g transform="translate(66 0)" font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="0" y="26" font-size="18" font-weight="600" letter-spacing="-0.4">WhatsApp</text>
+    <text x="0" y="46" font-size="18" font-weight="400" font-style="italic" letter-spacing="-0.4">Receptionist</text>
+  </g>
+</svg>

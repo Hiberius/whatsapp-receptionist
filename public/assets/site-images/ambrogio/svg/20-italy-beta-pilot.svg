@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title-a19 desc-a19">
+  <title id="title-a19">Beta studi italiani</title>
+  <desc id="desc-a19">Studi pilota italiani collegati ad Ambrogio.ai</desc>
+  
+  <defs>
+    <linearGradient id="bg-a19" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="46%" stop-color="#4ddac9"/>
+      <stop offset="100%" stop-color="#424958"/>
+    </linearGradient>
+    <linearGradient id="primary-a19" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <linearGradient id="accent-a19" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <radialGradient id="glow-a19" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#2dd4bf" stop-opacity=".45"/>
+      <stop offset="70%" stop-color="#2dd4bf" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow-a19" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0f172a" flood-opacity=".16"/>
+    </filter>
+    <filter id="smallShadow-a19" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid-a19" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M 58 0 L 0 0 0 58" fill="none" stroke="#0f172a" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots-a19" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#0f172a" opacity=".06"/>
+    </pattern>
+    <clipPath id="phoneClip-a19">
+      <rect x="0" y="0" width="360" height="700" rx="48"/>
+    </clipPath>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg-a19)"/>
+  <rect width="1600" height="1000" fill="url(#grid-a19)"/>
+  <circle cx="1030" cy="260" r="360" fill="url(#glow-a19)"/>
+  <circle cx="320" cy="700" r="300" fill="#f43f5e" opacity=".07"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    
+    <text x="120" y="130" fill="#111827" font-size="72" font-weight="880" opacity="1">Primi studi</text>
+    <text x="120" y="188" fill="#111827" font-size="42" font-weight="730" opacity="0.7">pilota in Italia</text>
+    <g transform="translate(670 120)">
+      <path d="M236 40 C300 84 280 154 330 190 C374 222 430 238 424 292 C418 350 350 338 334 388 C318 440 388 484 346 534 C306 582 250 540 214 590 C176 642 220 712 160 750 C112 782 72 724 94 666 C116 610 164 592 148 536 C132 480 70 478 62 420 C54 360 118 344 124 288 C130 230 82 188 116 134 C146 86 184 30 236 40Z" fill="#fff" opacity=".88" filter="url(#softShadow-a19)"/>
+      <circle cx="210" cy="150" r="22" fill="#0f172a"/><circle cx="210" cy="150" r="46" fill="#0f172a" opacity=".14"/><circle cx="300" cy="280" r="22" fill="#f43f5e"/><circle cx="300" cy="280" r="46" fill="#f43f5e" opacity=".14"/><circle cx="190" cy="390" r="22" fill="#0f172a"/><circle cx="190" cy="390" r="46" fill="#0f172a" opacity=".14"/><circle cx="270" cy="500" r="22" fill="#f43f5e"/><circle cx="270" cy="500" r="46" fill="#f43f5e" opacity=".14"/><circle cx="150" cy="640" r="22" fill="#0f172a"/><circle cx="150" cy="640" r="46" fill="#0f172a" opacity=".14"/>
+    </g>
+    <g transform="translate(120 300)">
+      <rect x="0" y="0" width="470" height="360" rx="54" fill="#fff" opacity=".88" filter="url(#softShadow-a19)"/>
+      <text x="54" y="84" fill="#0f172a" font-size="42" font-weight="870" opacity="1">Beta selezionata</text>
+      <text x="54" y="150" fill="#111827" font-size="70" font-weight="900" opacity="1">20 studi</text>
+      <text x="54" y="205" fill="#111827" font-size="42" font-weight="760" opacity="0.76">pilota</text>
+      <g filter="url(#smallShadow-a0)"><rect x="54" y="252" width="230" height="58" rx="29" fill="url(#primary-a19)" opacity="1" /><text x="82" y="291" fill="#fff" font-size="22" font-weight="750" opacity="1">Italia-first</text></g>
+    </g>
+  </g>
+</svg>

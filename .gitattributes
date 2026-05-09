@@ -1,0 +1,37 @@
+# Normalize line endings to LF on check-in, convert to OS native on checkout
+* text=auto eol=lf
+
+# Binary assets — never diff or merge
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.pdf  binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.eot  binary
+*.mp3  binary
+*.mp4  binary
+*.mov  binary
+
+# Text assets that should never be treated as binary
+*.svg  text
+*.json text
+*.md   text
+*.ts   text
+*.tsx  text
+*.js   text
+*.mjs  text
+*.css  text
+*.html text
+*.yml  text
+*.yaml text
+*.sh   text eol=lf
+
+# Lock files — exclude from diffs in PRs (still committed and tracked)
+package-lock.json -diff

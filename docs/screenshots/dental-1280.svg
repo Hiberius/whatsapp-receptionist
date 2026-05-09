@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800" role="img" aria-label="Dental vertical preview">
+  <title>Verticale dentista · WhatsApp Receptionist</title>
+  <defs>
+    <linearGradient id="dt-bg" x1="0" y1="0" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFAF6"/>
+      <stop offset="1" stop-color="#EFE9D7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" fill="url(#dt-bg)"/>
+
+  <!-- Browser chrome -->
+  <rect x="0" y="0" width="1280" height="44" fill="#0F4F4A"/>
+  <circle cx="20" cy="22" r="6" fill="#E8C56A"/>
+  <circle cx="40" cy="22" r="6" fill="#F5F1E8" opacity="0.5"/>
+  <circle cx="60" cy="22" r="6" fill="#F5F1E8" opacity="0.3"/>
+  <rect x="240" y="12" width="800" height="22" rx="11" fill="#F5F1E8" opacity="0.15"/>
+  <text x="640" y="28" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#F5F1E8" text-anchor="middle">whatsapp-receptionist.dev/verticali/dental</text>
+
+  <!-- Top nav -->
+  <rect x="0" y="44" width="1280" height="64" fill="#FAFAF6"/>
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="80" y="84" font-size="20" font-weight="600" letter-spacing="-0.4">WhatsApp</text>
+    <text x="186" y="84" font-size="20" font-weight="400" font-style="italic" letter-spacing="-0.4">Receptionist</text>
+  </g>
+
+  <!-- Breadcrumb -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68">
+    <text x="80" y="160">Home / Verticali / </text>
+    <text x="200" y="160" font-weight="600" fill="#0F4F4A">Studio Dentistico</text>
+  </g>
+
+  <!-- Hero -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="13" letter-spacing="2" font-weight="500" fill="#5C6B68">
+    <text x="80" y="200">VERTICALE DENTAL · STUDI DENTISTICI E ORTODONZIA</text>
+  </g>
+
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="80" y="280" font-size="56" font-weight="600" letter-spacing="-1.8">Per studi dentistici</text>
+    <text x="80" y="340" font-size="56" font-weight="400" font-style="italic" letter-spacing="-1.8">che dicono basta</text>
+    <text x="80" y="400" font-size="56" font-weight="600" letter-spacing="-1.8">al telefono che squilla.</text>
+  </g>
+
+  <text x="80" y="460" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#2A3938">Prima visita, controllo, urgenza, igiene: l'AI capisce, prenota,</text>
+  <text x="80" y="484" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#2A3938">smista al medico solo quando serve davvero.</text>
+
+  <!-- Feature grid -->
+  <g transform="translate(80 540)">
+    <rect width="200" height="120" rx="12" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="20" y="40" font-family="Inter, system-ui, sans-serif" font-size="22">📅</text>
+    <text x="20" y="74" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F4F4A">Prima visita</text>
+    <text x="20" y="98" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68">Triage, anamnesi, slot</text>
+
+    <rect x="220" width="200" height="120" rx="12" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="240" y="40" font-family="Inter, system-ui, sans-serif" font-size="22">🦷</text>
+    <text x="240" y="74" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F4F4A">Controllo</text>
+    <text x="240" y="98" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68">Recall semestrale auto</text>
+
+    <rect x="440" width="200" height="120" rx="12" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="460" y="40" font-family="Inter, system-ui, sans-serif" font-size="22">🚨</text>
+    <text x="460" y="74" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F4F4A">Urgenza</text>
+    <text x="460" y="98" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68">Escalation immediata</text>
+
+    <rect x="660" width="200" height="120" rx="12" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="680" y="40" font-family="Inter, system-ui, sans-serif" font-size="22">✨</text>
+    <text x="680" y="74" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#0F4F4A">Igiene</text>
+    <text x="680" y="98" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68">Reminder + reschedule</text>
+  </g>
+
+  <!-- Right column: testimonial card -->
+  <g transform="translate(900 200)">
+    <rect width="300" height="260" rx="20" fill="#0F4F4A"/>
+    <text x="30" y="60" font-family="Fraunces, Georgia, serif" font-size="60" fill="#E8C56A">"</text>
+    <text x="30" y="120" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8">In due settimane abbiamo</text>
+    <text x="30" y="142" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8">recuperato 40 ore di telefono</text>
+    <text x="30" y="164" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8">e zero appuntamenti persi.</text>
+    <line x1="30" y1="190" x2="100" y2="190" stroke="#E8C56A" stroke-width="2"/>
+    <text x="30" y="220" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F5F1E8">Dr. Marco R.</text>
+    <text x="30" y="238" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#F5F1E8" opacity="0.7">Studio dentistico, Milano</text>
+  </g>
+
+  <text x="80" y="720" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">Demo · le metriche reali sono caso d'uso interno</text>
+</svg>

@@ -1,0 +1,153 @@
+# ============================================================
+# whatsapp-receptionist — Docker Compose for self-hosting
+#
+# Env file: copy .env.example to .env.docker and fill in values.
+#   cp .env.example .env.docker
+#
+# Usage:
+#   docker compose --env-file .env.docker up -d --build
+#   docker compose --env-file .env.docker logs -f web
+#   docker compose --env-file .env.docker down
+#
+# NOTE: This compose file is for self-hosted production or staging.
+# For local development with hot-reload, use: npm run dev
+# ============================================================
+
+services:
+  # ----------------------------------------------------------
+  # web — Next.js standalone app (built via Dockerfile)
+  # ----------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Public env vars baked at build time
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://your-domain.com}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Ambrogio.ai}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+    image: whatsapp-receptionist:latest
+    container_name: whatsapp-receptionist-web
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    environment:
+      NODE_ENV: production
+      # App
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://your-domain.com}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Ambrogio.ai}
+      # Supabase (server-side)
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL:-}
+      SUPABASE_MEDIA_BUCKET: ${SUPABASE_MEDIA_BUCKET:-ambrogio-media}
+      # Anthropic
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL_PRIMARY: ${ANTHROPIC_MODEL_PRIMARY:-}
+      ANTHROPIC_MODEL_FAST: ${ANTHROPIC_MODEL_FAST:-}
+      AMBROGIO_AI_AUTOREPLY_ENABLED: ${AMBROGIO_AI_AUTOREPLY_ENABLED:-false}
+      # ElevenLabs
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_STT_MODEL: ${ELEVENLABS_STT_MODEL:-scribe_v2}
+      ELEVENLABS_TTS_MODEL: ${ELEVENLABS_TTS_MODEL:-eleven_flash_v2_5}
+      # WhatsApp
+      WHATSAPP_API_KEY: ${WHATSAPP_API_KEY:-}
+      WHATSAPP_API_URL: ${WHATSAPP_API_URL:-https://waba-v2.360dialog.io}
+      WHATSAPP_WEBHOOK_VERIFY_TOKEN: ${WHATSAPP_WEBHOOK_VERIFY_TOKEN:-}
+      WHATSAPP_WEBHOOK_HEADER_SECRET: ${WHATSAPP_WEBHOOK_HEADER_SECRET}
+      # Stripe
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_PRICE_STARTER: ${STRIPE_PRICE_STARTER:-}
+      STRIPE_PRICE_PROFESSIONAL: ${STRIPE_PRICE_PROFESSIONAL:-}
+      # Upstash Redis
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
+      # Google Calendar
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      GOOGLE_CALENDAR_REDIRECT_URI: ${GOOGLE_CALENDAR_REDIRECT_URI:-}
+      GOOGLE_OAUTH_STATE_SECRET: ${GOOGLE_OAUTH_STATE_SECRET:-}
+      INTEGRATION_CREDENTIALS_ENCRYPTION_KEY: ${INTEGRATION_CREDENTIALS_ENCRYPTION_KEY:-}
+      # Internal jobs
+      INTERNAL_JOB_SECRET: ${INTERNAL_JOB_SECRET}
+      # Fatture in Cloud (optional)
+      FATTUREINCLOUD_API_TOKEN: ${FATTUREINCLOUD_API_TOKEN:-}
+      FATTUREINCLOUD_COMPANY_ID: ${FATTUREINCLOUD_COMPANY_ID:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - app-net
+
+  # ----------------------------------------------------------
+  # redis — Valkey (Redis-compatible OSS) for rate limiting
+  # and outbox queue. Upstash-compatible wire protocol.
+  #
+  # For production at scale, use Upstash (managed) instead and
+  # set UPSTASH_REDIS_REST_URL/TOKEN in your env.
+  # ----------------------------------------------------------
+  redis:
+    image: valkey/valkey:8-alpine
+    container_name: whatsapp-receptionist-redis
+    restart: unless-stopped
+    # Persist data across restarts
+    command: valkey-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'valkey-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  # ----------------------------------------------------------
+  # caddy — Reverse proxy with automatic HTTPS (optional)
+  # Uncomment this service to enable HTTPS via Let's Encrypt.
+  #
+  # Prerequisites:
+  #   - Your domain's A record must point to this server
+  #   - Port 80 and 443 must be open
+  #   - Set CADDY_DOMAIN in your env file
+  #
+  # caddy:
+  #   image: caddy:2-alpine
+  #   container_name: whatsapp-receptionist-caddy
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  #     - caddy-data:/data
+  #     - caddy-config:/config
+  #   environment:
+  #     CADDY_DOMAIN: ${CADDY_DOMAIN:-localhost}
+  #   depends_on:
+  #     - web
+  #   networks:
+  #     - app-net
+  # ----------------------------------------------------------
+
+volumes:
+  redis-data:
+    driver: local
+  # Uncomment if using Caddy:
+  # caddy-data:
+  # caddy-config:
+
+networks:
+  app-net:
+    driver: bridge

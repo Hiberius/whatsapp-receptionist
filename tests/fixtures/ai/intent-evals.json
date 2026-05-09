@@ -1,0 +1,30 @@
+[
+  {
+    "text": "Buongiorno, vorrei prenotare una visita domani mattina",
+    "expectedIntent": "booking_request"
+  },
+  {
+    "text": "Possiamo spostare l'appuntamento di martedi?",
+    "expectedIntent": "reschedule_request"
+  },
+  {
+    "text": "Devo annullare la prenotazione di oggi",
+    "expectedIntent": "cancellation_request"
+  },
+  {
+    "text": "Quanto costa la prima visita?",
+    "expectedIntent": "pricing_question"
+  },
+  {
+    "text": "Siete aperti sabato pomeriggio?",
+    "expectedIntent": "opening_hours_question"
+  },
+  {
+    "text": "Vorrei parlare con una persona della segreteria",
+    "expectedIntent": "human_handoff"
+  },
+  {
+    "text": "Ciao, grazie mille",
+    "expectedIntent": "other"
+  }
+]

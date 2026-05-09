@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/Hiberius/whatsapp-receptionist/discussions
+    about: Ask open-ended questions, share ideas, show what you built.
+  - name: 📚 Documentation
+    url: https://github.com/Hiberius/whatsapp-receptionist#readme
+    about: Check the README, FAQ, and docs/ before opening an issue.
+  - name: 🔐 Security vulnerability
+    url: https://github.com/Hiberius/whatsapp-receptionist/security/advisories/new
+    about: Report a security issue privately. Do not open a public issue.

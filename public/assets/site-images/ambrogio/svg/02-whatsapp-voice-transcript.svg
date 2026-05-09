@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title-a1 desc-a1">
+  <title id="title-a1">Vocali WhatsApp trascritti</title>
+  <desc id="desc-a1">Messaggio vocale WhatsApp trasformato in testo e risposta di Ambrogio</desc>
+  
+  <defs>
+    <linearGradient id="bg-a1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="46%" stop-color="#57c7f9"/>
+      <stop offset="100%" stop-color="#5384ef"/>
+    </linearGradient>
+    <linearGradient id="primary-a1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="accent-a1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <radialGradient id="glow-a1" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity=".45"/>
+      <stop offset="70%" stop-color="#38bdf8" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow-a1" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0f172a" flood-opacity=".16"/>
+    </filter>
+    <filter id="smallShadow-a1" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid-a1" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M 58 0 L 0 0 0 58" fill="none" stroke="#0f172a" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots-a1" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#0f172a" opacity=".06"/>
+    </pattern>
+    <clipPath id="phoneClip-a1">
+      <rect x="0" y="0" width="360" height="700" rx="48"/>
+    </clipPath>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg-a1)"/>
+  <rect width="1600" height="1000" fill="url(#grid-a1)"/>
+  <circle cx="1170" cy="260" r="360" fill="url(#glow-a1)"/>
+  <circle cx="320" cy="780" r="300" fill="#10b981" opacity=".07"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    
+      <g transform="translate(125 110) scale(0.92)" filter="url(#softShadow-a1)">
+    <rect x="0" y="0" width="400" height="760" rx="64" fill="#0f172a"/>
+    <rect x="22" y="22" width="356" height="716" rx="50" fill="#f8fafc"/>
+    <rect x="132" y="38" width="136" height="24" rx="12" fill="#0f172a"/>
+    <g transform="translate(22 22)" clip-path="url(#phoneClip-a1)">
+      <rect width="356" height="716" fill="#f1f5f9"/>
+      <rect width="356" height="90" fill="url(#primary-a1)"/>
+      <circle cx="52" cy="48" r="24" fill="#fff" opacity=".92"/>
+      <text x="92" y="56" fill="#fff" font-size="25" font-weight="800">Ambrogio</text>
+      
+      <g>
+    <rect x="26" y="132" width="300" height="86" rx="24" fill="#fff" filter="url(#smallShadow-a0)"/>
+    <text x="50" y="168" fill="#0f172a" font-size="22" font-weight="650">Messaggio vocale</text>
+  </g>
+      <rect x="48" y="248" width="260" height="82" rx="41" fill="#dcfce7"/>
+      <circle cx="92" cy="289" r="24" fill="#2563eb"/><polygon points="86,277 86,301 106,289" fill="#fff"/>
+      <g><rect x="132" y="280" width="8" height="18" rx="4" fill="#2563eb" opacity="0.84" /><rect x="148" y="260.59782038430745" width="8" height="56.80435923138513" rx="4" fill="#2563eb" opacity="0.84" /><rect x="164" y="272.26048137781066" width="8" height="33.47903724437871" rx="4" fill="#2563eb" opacity="0.84" /><rect x="180" y="263.68511004400983" width="8" height="50.629779911980386" rx="4" fill="#2563eb" opacity="0.84" /><rect x="196" y="265.75248087815396" width="8" height="46.49503824369209" rx="4" fill="#2563eb" opacity="0.84" /><rect x="212" y="269.3684374715294" width="8" height="39.26312505694127" rx="4" fill="#2563eb" opacity="0.84" /><rect x="228" y="261.51155651801054" width="8" height="54.97688696397897" rx="4" fill="#2563eb" opacity="0.84" /><rect x="244" y="276.7434672598538" width="8" height="24.513065480292443" rx="4" fill="#2563eb" opacity="0.84" /><rect x="260" y="260.21252742512723" width="8" height="57.57494514974548" rx="4" fill="#2563eb" opacity="0.84" /><rect x="276" y="275.36332097153525" width="8" height="27.27335805692946" rx="4" fill="#2563eb" opacity="0.84" /></g>
+      <g>
+    <rect x="28" y="374" width="300" height="136" rx="24" fill="#fff" filter="url(#smallShadow-a0)"/>
+    <text x="52" y="410" fill="#0f172a" font-size="22" font-weight="650">Transcript: spostare</text><text x="52" y="438" fill="#0f172a" font-size="22" font-weight="650">visita a venerdi</text>
+  </g>
+      <g>
+    <rect x="74" y="545" width="252" height="92" rx="24" fill="#0f766e" filter="url(#smallShadow-a0)"/>
+    <text x="98" y="581" fill="#ffffff" font-size="22" font-weight="650">Fatto. Ti propongo due</text><text x="98" y="609" fill="#ffffff" font-size="22" font-weight="650">orari.</text>
+  </g>
+    </g>
+  </g>
+      <g transform="translate(670 160)">
+        <text x="0" y="60" fill="#111827" font-size="70" font-weight="850" opacity="1">Vocali capiti</text>
+        <text x="0" y="118" fill="#111827" font-size="38" font-weight="700" opacity="0.68">senza perdere il tono umano</text>
+        <rect x="0" y="190" width="690" height="300" rx="52" fill="#fff" opacity=".84" filter="url(#softShadow-a1)"/>
+        <g><rect x="72" y="321" width="8" height="18" rx="4" fill="#2563eb" opacity="0.84" /><rect x="88" y="285.7233097896499" width="8" height="88.55338042070022" rx="4" fill="#2563eb" opacity="0.84" /><rect x="104" y="306.92814795965575" width="8" height="46.14370408068856" rx="4" fill="#2563eb" opacity="0.84" /><rect x="120" y="291.3365637163815" width="8" height="77.32687256723705" rx="4" fill="#2563eb" opacity="0.84" /><rect x="136" y="295.09541977846175" width="8" height="69.80916044307654" rx="4" fill="#2563eb" opacity="0.84" /><rect x="152" y="301.66988631187155" width="8" height="56.66022737625685" rx="4" fill="#2563eb" opacity="0.84" /><rect x="168" y="287.38464821456455" width="8" height="85.23070357087084" rx="4" fill="#2563eb" opacity="0.84" /><rect x="184" y="315.07903138155234" width="8" height="29.841937236895347" rx="4" fill="#2563eb" opacity="0.84" /><rect x="200" y="285.02277713659504" width="8" height="89.95444572680996" rx="4" fill="#2563eb" opacity="0.84" /><rect x="216" y="312.5696744937005" width="8" height="34.86065101259902" rx="4" fill="#2563eb" opacity="0.84" /><rect x="232" y="288.3856292768953" width="8" height="83.22874144620931" rx="4" fill="#2563eb" opacity="0.84" /><rect x="248" y="299.55982021123117" width="8" height="60.88035957753766" rx="4" fill="#2563eb" opacity="0.84" /><rect x="264" y="296.93810503091083" width="8" height="66.12378993817836" rx="4" fill="#2563eb" opacity="0.84" /><rect x="280" y="289.96154373471575" width="8" height="80.07691253056853" rx="4" fill="#2563eb" opacity="0.84" /><rect x="296" y="309.3193279155235" width="8" height="41.36134416895296" rx="4" fill="#2563eb" opacity="0.84" /><rect x="312" y="285.30213015808977" width="8" height="89.39573968382051" rx="4" fill="#2563eb" opacity="0.84" /><rect x="328" y="318.4408117241232" width="8" height="23.118376551753595" rx="4" fill="#2563eb" opacity="0.84" /><rect x="344" y="286.3229889332975" width="8" height="87.35402213340497" rx="4" fill="#2563eb" opacity="0.84" /><rect x="360" y="304.60817135955614" width="8" height="50.7836572808877" rx="4" fill="#2563eb" opacity="0.84" /><rect x="376" y="292.86168023125066" width="8" height="74.27663953749867" rx="4" fill="#2563eb" opacity="0.84" /><rect x="392" y="293.383811305121" width="8" height="73.232377389758" rx="4" fill="#2563eb" opacity="0.84" /><rect x="408" y="303.8777624916705" width="8" height="52.24447501665899" rx="4" fill="#2563eb" opacity="0.84" /><rect x="424" y="286.55376031734" width="8" height="86.89247936532" rx="4" fill="#2563eb" opacity="0.84" /><rect x="440" y="317.6183482799147" width="8" height="24.763303440170645" rx="4" fill="#2563eb" opacity="0.84" /><rect x="456" y="285.204821333176" width="8" height="89.5903573336479" rx="4" fill="#2563eb" opacity="0.84" /><rect x="472" y="310.10297492377265" width="8" height="39.794050152454716" rx="4" fill="#2563eb" opacity="0.84" /><rect x="488" y="289.5516385554902" width="8" height="80.89672288901963" rx="4" fill="#2563eb" opacity="0.84" /><rect x="504" y="297.5582410918961" width="8" height="64.88351781620779" rx="4" fill="#2563eb" opacity="0.84" /></g>
+        <path d="M80 430 C160 360 246 500 340 414 S540 372 635 442" stroke="#10b981" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <g filter="url(#smallShadow-a0)"><rect x="72" y="228" width="300" height="58" rx="29" fill="url(#primary-a1)" opacity="1" /><text x="100" y="267" fill="#fff" font-size="22" font-weight="750" opacity="1">ElevenLabs STT</text></g>
+        <g filter="url(#smallShadow-a0)"><rect x="400" y="228" width="260" height="58" rx="29" fill="#0f172a" opacity="1" /><text x="428" y="267" fill="#fff" font-size="22" font-weight="750" opacity="1">Risposta vocale</text></g>
+      </g>
+  </g>
+</svg>

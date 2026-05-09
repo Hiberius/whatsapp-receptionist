@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title-a12 desc-a12">
+  <title id="title-a12">Onboarding in tre step</title>
+  <desc id="desc-a12">Connetti WhatsApp, configura FAQ e vai live con Ambrogio</desc>
+  
+  <defs>
+    <linearGradient id="bg-a12" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="46%" stop-color="#97d33b"/>
+      <stop offset="100%" stop-color="#3b816e"/>
+    </linearGradient>
+    <linearGradient id="primary-a12" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#84cc16"/>
+    </linearGradient>
+    <linearGradient id="accent-a12" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#84cc16"/>
+    </linearGradient>
+    <radialGradient id="glow-a12" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#84cc16" stop-opacity=".45"/>
+      <stop offset="70%" stop-color="#84cc16" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#84cc16" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow-a12" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0f172a" flood-opacity=".16"/>
+    </filter>
+    <filter id="smallShadow-a12" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid-a12" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M 58 0 L 0 0 0 58" fill="none" stroke="#0f172a" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots-a12" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#0f172a" opacity=".06"/>
+    </pattern>
+    <clipPath id="phoneClip-a12">
+      <rect x="0" y="0" width="360" height="700" rx="48"/>
+    </clipPath>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg-a12)"/>
+  <rect width="1600" height="1000" fill="url(#grid-a12)"/>
+  <circle cx="1240" cy="180" r="360" fill="url(#glow-a12)"/>
+  <circle cx="260" cy="820" r="300" fill="#0ea5e9" opacity=".07"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    
+    <text x="120" y="140" fill="#111827" font-size="72" font-weight="880" opacity="1">Tre step</text>
+    <text x="120" y="198" fill="#111827" font-size="42" font-weight="730" opacity="0.7">e lo studio e' online</text>
+    <g transform="translate(130 330)">
+    <rect x="0" y="0" width="330" height="300" rx="50" fill="#fff" opacity=".88" filter="url(#softShadow-a12)"/>
+    <circle cx="72" cy="76" r="38" fill="url(#primary-a12)"/>
+    <text x="72" y="88" text-anchor="middle" fill="#fff" font-size="34" font-weight="900">1</text>
+    <text x="46" y="154" fill="#111827" font-size="38" font-weight="850" opacity="1">Connetti</text>
+    <text x="46" y="206" fill="#111827" font-size="24" font-weight="700" opacity="0.62">WhatsApp Business</text>
+  </g>
+    <g transform="translate(570 260)">
+    <rect x="0" y="0" width="330" height="300" rx="50" fill="#fff" opacity=".88" filter="url(#softShadow-a12)"/>
+    <circle cx="72" cy="76" r="38" fill="url(#primary-a12)"/>
+    <text x="72" y="88" text-anchor="middle" fill="#fff" font-size="34" font-weight="900">2</text>
+    <text x="46" y="154" fill="#111827" font-size="38" font-weight="850" opacity="1">Configura</text>
+    <text x="46" y="206" fill="#111827" font-size="24" font-weight="700" opacity="0.62">FAQ, orari, servizi</text>
+  </g>
+    <g transform="translate(1010 330)">
+    <rect x="0" y="0" width="330" height="300" rx="50" fill="#fff" opacity=".88" filter="url(#softShadow-a12)"/>
+    <circle cx="72" cy="76" r="38" fill="url(#primary-a12)"/>
+    <text x="72" y="88" text-anchor="middle" fill="#fff" font-size="34" font-weight="900">3</text>
+    <text x="46" y="154" fill="#111827" font-size="38" font-weight="850" opacity="1">Vai live</text>
+    <text x="46" y="206" fill="#111827" font-size="24" font-weight="700" opacity="0.62">Ambrogio prenota</text>
+  </g>
+    <path d="M465 510 C520 440 560 420 620 420" stroke="url(#accent-a12)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M900 420 C960 420 1000 450 1052 510" stroke="url(#accent-a12)" stroke-width="10" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

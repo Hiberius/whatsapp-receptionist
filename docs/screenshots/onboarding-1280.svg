@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800" role="img" aria-label="Onboarding wizard preview">
+  <title>Onboarding wizard · WhatsApp Receptionist</title>
+  <defs>
+    <linearGradient id="ob-bg" x1="0" y1="0" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFAF6"/>
+      <stop offset="1" stop-color="#F0EDE2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" fill="url(#ob-bg)"/>
+
+  <!-- Browser chrome -->
+  <rect x="0" y="0" width="1280" height="44" fill="#0F4F4A"/>
+  <circle cx="20" cy="22" r="6" fill="#E8C56A"/>
+  <circle cx="40" cy="22" r="6" fill="#F5F1E8" opacity="0.5"/>
+  <circle cx="60" cy="22" r="6" fill="#F5F1E8" opacity="0.3"/>
+  <rect x="240" y="12" width="800" height="22" rx="11" fill="#F5F1E8" opacity="0.15"/>
+  <text x="640" y="28" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#F5F1E8" text-anchor="middle">app.whatsapp-receptionist.dev/onboarding</text>
+
+  <!-- Header -->
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="80" y="100" font-size="20" font-weight="600" letter-spacing="-0.4">WhatsApp</text>
+    <text x="186" y="100" font-size="20" font-weight="400" font-style="italic" letter-spacing="-0.4">Receptionist</text>
+  </g>
+  <text x="1200" y="100" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68" text-anchor="end">Step 2 di 4</text>
+
+  <!-- Progress bar -->
+  <rect x="80" y="130" width="1120" height="4" rx="2" fill="#E5E2D6"/>
+  <rect x="80" y="130" width="560" height="4" rx="2" fill="#0F4F4A"/>
+
+  <!-- Step indicators -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="11">
+    <g transform="translate(140 156)">
+      <circle r="12" fill="#0F4F4A"/>
+      <text y="4" font-size="11" font-weight="700" fill="#F5F1E8" text-anchor="middle">✓</text>
+      <text y="36" fill="#0F4F4A" font-weight="600" text-anchor="middle">Studio</text>
+    </g>
+    <g transform="translate(420 156)">
+      <circle r="12" fill="#0F4F4A"/>
+      <text y="4" font-size="11" font-weight="700" fill="#F5F1E8" text-anchor="middle">2</text>
+      <text y="36" fill="#0F4F4A" font-weight="600" text-anchor="middle">WhatsApp</text>
+    </g>
+    <g transform="translate(700 156)">
+      <circle r="12" fill="none" stroke="#5C6B68" stroke-width="1.5"/>
+      <text y="4" font-size="11" font-weight="600" fill="#5C6B68" text-anchor="middle">3</text>
+      <text y="36" fill="#5C6B68" text-anchor="middle">Calendario</text>
+    </g>
+    <g transform="translate(980 156)">
+      <circle r="12" fill="none" stroke="#5C6B68" stroke-width="1.5"/>
+      <text y="4" font-size="11" font-weight="600" fill="#5C6B68" text-anchor="middle">4</text>
+      <text y="36" fill="#5C6B68" text-anchor="middle">Pubblica</text>
+    </g>
+  </g>
+
+  <!-- Main card -->
+  <g transform="translate(280 240)">
+    <rect width="720" height="500" rx="20" fill="#FFFFFF" stroke="#E5E2D6"/>
+
+    <!-- Header -->
+    <g transform="translate(60 80)">
+      <text font-family="Inter, system-ui, sans-serif" font-size="13" letter-spacing="2" font-weight="500" fill="#5C6B68">STEP 2 · CONNETTI WHATSAPP</text>
+      <text font-family="Fraunces, Georgia, serif" font-size="38" font-weight="600" letter-spacing="-1.2" y="50" fill="#0F4F4A">Collega il numero WhatsApp</text>
+      <text font-family="Inter, system-ui, sans-serif" font-size="14" fill="#2A3938" y="86">Usiamo solo Meta WhatsApp Cloud API ufficiale. Niente Baileys, niente librerie scraped.</text>
+    </g>
+
+    <!-- Form -->
+    <g transform="translate(60 220)" font-family="Inter, system-ui, sans-serif">
+      <text font-size="13" font-weight="600" fill="#0F4F4A">PHONE NUMBER ID</text>
+      <rect y="14" width="600" height="48" rx="10" fill="#FAFAF6" stroke="#E5E2D6"/>
+      <text x="20" y="44" font-size="14" font-family="JetBrains Mono, monospace" fill="#0F4F4A">123456789012345</text>
+
+      <text font-size="13" font-weight="600" fill="#0F4F4A" y="100">WABA ID (BUSINESS ACCOUNT)</text>
+      <rect y="114" width="600" height="48" rx="10" fill="#FAFAF6" stroke="#E5E2D6"/>
+      <text x="20" y="144" font-size="14" font-family="JetBrains Mono, monospace" fill="#0F4F4A">987654321098765</text>
+
+      <text font-size="13" font-weight="600" fill="#0F4F4A" y="200">ACCESS TOKEN</text>
+      <rect y="214" width="600" height="48" rx="10" fill="#FAFAF6" stroke="#E5E2D6"/>
+      <text x="20" y="244" font-size="14" font-family="JetBrains Mono, monospace" fill="#5C6B68">EAAB••••••••••••••••••••••••••</text>
+      <rect x="540" y="226" width="48" height="24" rx="6" fill="#0F4F4A"/>
+      <text x="564" y="242" font-size="11" font-weight="600" fill="#F5F1E8" text-anchor="middle">show</text>
+    </g>
+  </g>
+
+  <!-- Footer buttons -->
+  <g transform="translate(280 770)">
+    <rect width="100" height="44" rx="22" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+    <text x="50" y="29" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#0F4F4A" text-anchor="middle">Indietro</text>
+  </g>
+  <g transform="translate(870 770)">
+    <rect width="130" height="44" rx="22" fill="#0F4F4A"/>
+    <text x="65" y="29" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F5F1E8" text-anchor="middle">Continua →</text>
+  </g>
+</svg>

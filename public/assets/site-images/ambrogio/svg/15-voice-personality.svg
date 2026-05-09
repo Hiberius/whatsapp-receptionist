@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title-a14 desc-a14">
+  <title id="title-a14">Voce naturale</title>
+  <desc id="desc-a14">Voce AI naturale per risposte vocali WhatsApp opzionali</desc>
+  
+  <defs>
+    <linearGradient id="bg-a14" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="46%" stop-color="#b1e955"/>
+      <stop offset="100%" stop-color="#4d74e0"/>
+    </linearGradient>
+    <linearGradient id="primary-a14" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#a3e635"/>
+    </linearGradient>
+    <linearGradient id="accent-a14" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#a3e635"/>
+    </linearGradient>
+    <radialGradient id="glow-a14" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#a3e635" stop-opacity=".45"/>
+      <stop offset="70%" stop-color="#a3e635" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#a3e635" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow-a14" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0f172a" flood-opacity=".16"/>
+    </filter>
+    <filter id="smallShadow-a14" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid-a14" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M 58 0 L 0 0 0 58" fill="none" stroke="#0f172a" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots-a14" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#0f172a" opacity=".06"/>
+    </pattern>
+    <clipPath id="phoneClip-a14">
+      <rect x="0" y="0" width="360" height="700" rx="48"/>
+    </clipPath>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg-a14)"/>
+  <rect width="1600" height="1000" fill="url(#grid-a14)"/>
+  <circle cx="1100" cy="340" r="360" fill="url(#glow-a14)"/>
+  <circle cx="380" cy="740" r="300" fill="#eab308" opacity=".07"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    
+    <text x="120" y="140" fill="#111827" font-size="72" font-weight="880" opacity="1">Una voce</text>
+    <text x="120" y="198" fill="#111827" font-size="42" font-weight="730" opacity="0.7">che sembra parte dello studio</text>
+    <g transform="translate(180 300)">
+      <rect x="0" y="0" width="340" height="430" rx="64" fill="#fff" opacity=".88" filter="url(#softShadow-a14)"/>
+      <rect x="126" y="70" width="88" height="190" rx="44" fill="url(#primary-a14)"/>
+      <rect x="104" y="260" width="132" height="26" rx="13" fill="#111827" opacity=".82"/>
+      <path d="M72 190 C72 320 268 320 268 190" stroke="#eab308" stroke-width="18" fill="none" stroke-linecap="round"/>
+      <path d="M170 286 V350" stroke="#111827" stroke-width="18" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(650 310)">
+      <g><rect x="0" y="191" width="8" height="18" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="16" y="150.43180625809737" width="8" height="99.13638748380525" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="32" y="174.8173701536041" width="8" height="50.36525969279184" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="48" y="156.8870482738387" width="8" height="86.22590345232261" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="64" y="161.209732745231" width="8" height="77.58053450953801" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="80" y="168.77036925865232" width="8" height="62.459261482695375" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="96" y="152.34234544674928" width="8" height="95.31530910650146" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="112" y="184.19088608878516" width="8" height="31.618227822429652" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="128" y="149.62619370708427" width="8" height="100.74761258583145" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="144" y="181.30512566775556" width="8" height="37.38974866448888" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="160" y="153.49347366842966" width="8" height="93.0130526631407" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="176" y="166.34379324291586" width="8" height="67.3124135141683" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="192" y="163.32882078554746" width="8" height="73.3423584289051" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="208" y="155.3057752949231" width="8" height="89.3884494101538" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="224" y="177.56722710285206" width="8" height="44.865545794295905" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="240" y="149.94744968180322" width="8" height="100.10510063639357" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="256" y="188.05693348274167" width="8" height="23.886133034516632" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="272" y="151.12143727329214" width="8" height="97.75712545341571" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="288" y="172.14939706348957" width="8" height="55.701205873020854" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="304" y="158.64093226593826" width="8" height="82.71813546812346" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="320" y="159.24138300088916" width="8" height="81.5172339982217" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="336" y="171.30942686542107" width="8" height="57.38114626915783" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="352" y="151.386824364941" width="8" height="97.22635127011799" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="368" y="187.11110052190188" width="8" height="25.777798956196243" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="384" y="149.83554453315247" width="8" height="100.32891093369508" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="400" y="178.46842116233853" width="8" height="43.06315767532291" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="416" y="154.83438433881372" width="8" height="90.33123132237257" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="432" y="164.04197725568054" width="8" height="71.91604548863896" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="448" y="165.58792456881534" width="8" height="68.82415086236932" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="464" y="153.9051145462424" width="8" height="92.18977090751518" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="480" y="180.38505367719307" width="8" height="39.22989264561389" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="496" y="149.67081838126626" width="8" height="100.6583632374675" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="512" y="185.12875883697808" width="8" height="29.742482326043824" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="528" y="152.01285320501466" width="8" height="95.97429358997069" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="544" y="169.57680773547565" width="8" height="60.8463845290487" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="560" y="160.55855264508816" width="8" height="78.88289470982369" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="576" y="157.43373137207672" width="8" height="85.13253725584656" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="592" y="173.9481184706259" width="8" height="52.10376305874822" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="608" y="150.63174534504196" width="8" height="98.73650930991607" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="624" y="190.0509927268065" width="8" height="19.898014546386978" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="640" y="150.2531868733158" width="8" height="99.49362625336839" rx="4" fill="#1d4ed8" opacity="0.84" /><rect x="656" y="175.69512625387847" width="8" height="48.60974749224305" rx="4" fill="#1d4ed8" opacity="0.84" /></g>
+      <path d="M0 360 C160 250 270 450 450 320 S690 280 780 400" stroke="#eab308" stroke-width="12" fill="none" stroke-linecap="round" opacity=".9"/>
+      <g filter="url(#smallShadow-a0)"><rect x="0" y="50" width="240" height="58" rx="29" fill="url(#primary-a14)" opacity="1" /><text x="28" y="89" fill="#fff" font-size="22" font-weight="750" opacity="1">STT + TTS</text></g>
+      <g filter="url(#smallShadow-a0)"><rect x="270" y="50" width="240" height="58" rx="29" fill="#fff" opacity="1" /><text x="298" y="89" fill="#1d4ed8" font-size="22" font-weight="750" opacity="1">Tenant voice</text></g>
+    </g>
+  </g>
+</svg>

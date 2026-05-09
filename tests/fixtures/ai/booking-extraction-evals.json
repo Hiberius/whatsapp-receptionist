@@ -1,0 +1,50 @@
+[
+  {
+    "text": "Vorrei prenotare una igiene domani pomeriggio",
+    "expected": {
+      "serviceQuery": "igiene",
+      "dateLabel": "domani",
+      "dayPart": "afternoon",
+      "customerName": null
+    }
+  },
+  {
+    "text": "Annulla quello delle 15",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "dayPart": "exact_hour",
+      "startHour": 15,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Sposta quello di domani",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "domani",
+      "dayPart": "any",
+      "customerName": null
+    }
+  },
+  {
+    "text": "Annulla la visita di Mario",
+    "expected": {
+      "serviceQuery": "visita",
+      "dateLabel": null,
+      "dayPart": "any",
+      "customerName": "Mario"
+    }
+  },
+  {
+    "text": "Sposta la visita di Mario a venerdi mattina",
+    "expected": {
+      "serviceQuery": "visita",
+      "dateLabel": "venerdi",
+      "dayPart": "morning",
+      "startHour": 8,
+      "endHour": 13,
+      "customerName": "Mario"
+    }
+  }
+]

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800" role="img" aria-label="Pricing page preview">
+  <title>Pricing · WhatsApp Receptionist</title>
+  <defs>
+    <linearGradient id="pr-bg" x1="0" y1="0" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFAF6"/>
+      <stop offset="1" stop-color="#F0EDE2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" fill="url(#pr-bg)"/>
+
+  <!-- Browser chrome -->
+  <rect x="0" y="0" width="1280" height="44" fill="#0F4F4A"/>
+  <circle cx="20" cy="22" r="6" fill="#E8C56A"/>
+  <circle cx="40" cy="22" r="6" fill="#F5F1E8" opacity="0.5"/>
+  <circle cx="60" cy="22" r="6" fill="#F5F1E8" opacity="0.3"/>
+  <rect x="240" y="12" width="800" height="22" rx="11" fill="#F5F1E8" opacity="0.15"/>
+  <text x="640" y="28" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#F5F1E8" text-anchor="middle">whatsapp-receptionist.dev/pricing</text>
+
+  <!-- Top nav -->
+  <rect x="0" y="44" width="1280" height="64" fill="#FAFAF6"/>
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="80" y="84" font-size="20" font-weight="600" letter-spacing="-0.4">WhatsApp</text>
+    <text x="186" y="84" font-size="20" font-weight="400" font-style="italic" letter-spacing="-0.4">Receptionist</text>
+  </g>
+
+  <!-- Header -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="13" letter-spacing="2" font-weight="500" fill="#5C6B68">
+    <text x="640" y="180" text-anchor="middle">PRICING</text>
+  </g>
+  <text x="640" y="240" font-family="Fraunces, Georgia, serif" font-size="48" font-weight="600" letter-spacing="-1.5" fill="#0F4F4A" text-anchor="middle">Prezzi semplici, senza sorprese</text>
+  <text x="640" y="276" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#2A3938" text-anchor="middle">Self-hostato gratis. Cloud gestito quando preferisci che ce ne occupiamo noi.</text>
+
+  <!-- Pricing cards -->
+  <g transform="translate(160 340)">
+    <!-- Free / Self-host -->
+    <rect width="300" height="380" rx="20" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="30" y="60" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#5C6B68">SELF-HOSTED</text>
+    <text x="30" y="100" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#0F4F4A">€0</text>
+    <text x="30" y="124" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">forever · MIT license</text>
+    <line x1="30" y1="150" x2="270" y2="150" stroke="#E5E2D6" stroke-width="1"/>
+    <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#2A3938">
+      <text x="30" y="180">✓  Codice open source completo</text>
+      <text x="30" y="208">✓  Multi-tenant Supabase RLS</text>
+      <text x="30" y="236">✓  WhatsApp Cloud API</text>
+      <text x="30" y="264">✓  Google Calendar OAuth</text>
+      <text x="30" y="292">✓  GDPR + SDI integrati</text>
+      <text x="30" y="320">✓  Community Discord</text>
+    </g>
+    <rect x="30" y="340" width="240" height="40" rx="20" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+    <text x="150" y="365" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#0F4F4A" text-anchor="middle">Clona il repo</text>
+  </g>
+
+  <!-- Pro (highlighted) -->
+  <g transform="translate(490 320)">
+    <rect width="300" height="400" rx="20" fill="#0F4F4A"/>
+    <rect x="30" y="-1" width="80" height="24" rx="12" fill="#E8C56A"/>
+    <text x="70" y="14" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="#0F4F4A" text-anchor="middle">POPOLARE</text>
+    <text x="30" y="80" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#E8C56A">PRO CLOUD</text>
+    <text x="30" y="120" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#F5F1E8">€89</text>
+    <text x="100" y="120" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#F5F1E8">/mese</text>
+    <text x="30" y="144" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#F5F1E8" opacity="0.7">fino a 1.500 conversazioni/mese</text>
+    <line x1="30" y1="170" x2="270" y2="170" stroke="#F5F1E8" stroke-width="1" opacity="0.2"/>
+    <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#F5F1E8">
+      <text x="30" y="200">✓  Tutto Self-Hosted, gestito da noi</text>
+      <text x="30" y="228">✓  Hosting EU + backup giornalieri</text>
+      <text x="30" y="256">✓  Numero WhatsApp dedicato</text>
+      <text x="30" y="284">✓  ElevenLabs voce inclusa</text>
+      <text x="30" y="312">✓  Fatturazione SDI automatica</text>
+      <text x="30" y="340">✓  Support 8/5 in italiano</text>
+    </g>
+    <rect x="30" y="360" width="240" height="40" rx="20" fill="#E8C56A"/>
+    <text x="150" y="385" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#0F4F4A" text-anchor="middle">Inizia 14 giorni gratis</text>
+  </g>
+
+  <!-- Enterprise -->
+  <g transform="translate(820 340)">
+    <rect width="300" height="380" rx="20" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="30" y="60" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#5C6B68">ENTERPRISE</text>
+    <text x="30" y="100" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="600" fill="#0F4F4A">Custom</text>
+    <text x="30" y="124" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5C6B68">white-label · SLA · DPA</text>
+    <line x1="30" y1="150" x2="270" y2="150" stroke="#E5E2D6" stroke-width="1"/>
+    <g font-family="Inter, system-ui, sans-serif" font-size="13" fill="#2A3938">
+      <text x="30" y="180">✓  Tutto Pro, scalato a te</text>
+      <text x="30" y="208">✓  White-label completo</text>
+      <text x="30" y="236">✓  Single-tenant dedicato</text>
+      <text x="30" y="264">✓  Volumi illimitati</text>
+      <text x="30" y="292">✓  DPA custom + SLA 99.9%</text>
+      <text x="30" y="320">✓  Account manager dedicato</text>
+    </g>
+    <rect x="30" y="340" width="240" height="40" rx="20" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+    <text x="150" y="365" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#0F4F4A" text-anchor="middle">Parla col team</text>
+  </g>
+
+  <text x="640" y="770" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#5C6B68" text-anchor="middle">Tutti i prezzi escludono IVA · Fatturazione elettronica SDI inclusa · Cancelli quando vuoi</text>
+</svg>

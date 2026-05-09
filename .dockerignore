@@ -1,0 +1,69 @@
+# whatsapp-receptionist — .dockerignore
+# Keeps the build context small and avoids leaking sensitive files.
+
+# Dependencies — reinstalled during build
+node_modules
+
+# Next.js build artifacts
+.next
+out
+build
+dist
+
+# Environment files — NEVER ship secrets into the image
+.env
+.env.*
+!.env.example
+
+# Git history
+.git
+.gitignore
+.gitattributes
+
+# Dev / editor files
+.editorconfig
+.prettierrc.json
+.prettierignore
+.eslintignore
+.eslintcache
+eslint.config.mjs
+tsconfig.tsbuildinfo
+
+# Test artifacts
+coverage
+tests/__snapshots__
+playwright-report
+
+# Logs
+*.log
+setup.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# Documentation and strategy files (not needed at runtime)
+00_README_START_HERE.md
+01_STRATEGIA
+02_NOMI_E_BRAND
+03_CODEX_BACKEND_PROMPTS
+04_CODEX_FRONTEND_PROMPTS
+05_LEGAL_GDPR
+06_GTM_E_VENDITA
+07_INFRASTRUCTURE
+08_LAUNCH_CHECKLIST.md
+CONTRIBUTING.md
+LICENSE
+pricing.md
+docs
+AGENTS.md
+
+# Supabase local dev files (not needed in the app image)
+supabase/.branches
+supabase/.temp

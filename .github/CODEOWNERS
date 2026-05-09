@@ -1,0 +1,12 @@
+# Default — all PRs require review from the project maintainer
+* @Hiberius
+
+# Security-critical paths (extra caution required)
+/src/middleware.ts                @Hiberius
+/src/lib/security/                @Hiberius
+/src/lib/auth/                    @Hiberius
+/supabase/migrations/             @Hiberius
+/src/server/billing/              @Hiberius
+/src/server/gdpr/                 @Hiberius
+/.github/workflows/               @Hiberius
+/.github/CODEOWNERS               @Hiberius

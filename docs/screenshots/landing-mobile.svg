@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" width="375" height="812" role="img" aria-label="Landing mobile preview">
+  <title>Landing mobile · WhatsApp Receptionist</title>
+  <defs>
+    <linearGradient id="lm-bg" x1="0" y1="0" x2="0" y2="812" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFAF6"/>
+      <stop offset="1" stop-color="#F0EDE2"/>
+    </linearGradient>
+  </defs>
+  <rect width="375" height="812" fill="url(#lm-bg)"/>
+
+  <!-- Status bar -->
+  <rect width="375" height="40" fill="#0F4F4A"/>
+  <text x="20" y="26" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F5F1E8">9:41</text>
+  <text x="320" y="26" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#F5F1E8">100%</text>
+
+  <!-- Top nav -->
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="20" y="80" font-size="16" font-weight="600" letter-spacing="-0.3">WhatsApp</text>
+    <text x="106" y="80" font-size="16" font-weight="400" font-style="italic" letter-spacing="-0.3">Receptionist</text>
+  </g>
+  <rect x="320" y="60" width="36" height="28" rx="4" fill="none" stroke="#0F4F4A" stroke-width="1.5"/>
+  <line x1="328" y1="70" x2="348" y2="70" stroke="#0F4F4A" stroke-width="1.5"/>
+  <line x1="328" y1="76" x2="348" y2="76" stroke="#0F4F4A" stroke-width="1.5"/>
+  <line x1="328" y1="82" x2="348" y2="82" stroke="#0F4F4A" stroke-width="1.5"/>
+
+  <!-- Hero -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="11" letter-spacing="1.5" font-weight="500" fill="#5C6B68">
+    <text x="20" y="160">OPEN SOURCE · MIT</text>
+  </g>
+
+  <g font-family="Fraunces, Georgia, serif" fill="#0F4F4A">
+    <text x="20" y="220" font-size="38" font-weight="600" letter-spacing="-1.2">L'AI receptionist</text>
+    <text x="20" y="260" font-size="38" font-weight="400" font-style="italic" letter-spacing="-1.2">che prende</text>
+    <text x="20" y="300" font-size="38" font-weight="600" letter-spacing="-1.2">appuntamenti.</text>
+  </g>
+
+  <text x="20" y="340" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#2A3938">Su WhatsApp. 24/7. In italiano vero.</text>
+
+  <rect x="20" y="370" width="335" height="48" rx="24" fill="#0F4F4A"/>
+  <text x="187" y="400" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#F5F1E8" text-anchor="middle">Inizia gratis</text>
+
+  <!-- Phone preview small -->
+  <g transform="translate(50 460)">
+    <rect width="275" height="280" rx="24" fill="#0F4F4A"/>
+    <rect x="10" y="10" width="255" height="260" rx="14" fill="#F5F1E8"/>
+    <rect x="10" y="10" width="255" height="40" rx="14" fill="#1A6F68"/>
+    <rect x="10" y="34" width="255" height="16" fill="#1A6F68"/>
+    <text x="50" y="36" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#F5F1E8">Studio Dr. Rossi</text>
+    <text x="50" y="46" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#E8C56A">online · AI</text>
+
+    <rect x="30" y="70" width="160" height="32" rx="10" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="40" y="90" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#2A3938">Vorrei una visita</text>
+
+    <rect x="80" y="116" width="180" height="46" rx="10" fill="#1A6F68"/>
+    <text x="90" y="134" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#F5F1E8">Mar 14 alle 10:30 o</text>
+    <text x="90" y="148" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#F5F1E8">Gio 16 alle 15:00.</text>
+
+    <rect x="30" y="176" width="120" height="28" rx="10" fill="#FFFFFF" stroke="#E5E2D6" stroke-width="1"/>
+    <text x="40" y="194" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#2A3938">Mar 14, 10:30</text>
+
+    <rect x="80" y="218" width="180" height="42" rx="10" fill="#1A6F68"/>
+    <text x="90" y="236" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="600" fill="#E8C56A">📅 Confermato!</text>
+    <text x="90" y="250" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#F5F1E8">SMS in arrivo.</text>
+  </g>
+
+  <text x="20" y="780" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#5C6B68">⭐ 369 test · 🛡 GDPR · 🇮🇹 SDI · ⚡ Multi-tenant</text>
+</svg>

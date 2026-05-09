@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title-a7 desc-a7">
+  <title id="title-a7">Palestra e pilates</title>
+  <desc id="desc-a7">Studio fitness con calendario lezioni e richieste WhatsApp</desc>
+  
+  <defs>
+    <linearGradient id="bg-a7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fdf2f8"/>
+      <stop offset="46%" stop-color="#f586c1"/>
+      <stop offset="100%" stop-color="#6c61d4"/>
+    </linearGradient>
+    <linearGradient id="primary-a7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+    <linearGradient id="accent-a7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+    <radialGradient id="glow-a7" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#f472b6" stop-opacity=".45"/>
+      <stop offset="70%" stop-color="#f472b6" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#f472b6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow-a7" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0f172a" flood-opacity=".16"/>
+    </filter>
+    <filter id="smallShadow-a7" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid-a7" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M 58 0 L 0 0 0 58" fill="none" stroke="#0f172a" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots-a7" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#0f172a" opacity=".06"/>
+    </pattern>
+    <clipPath id="phoneClip-a7">
+      <rect x="0" y="0" width="360" height="700" rx="48"/>
+    </clipPath>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg-a7)"/>
+  <rect width="1600" height="1000" fill="url(#grid-a7)"/>
+  <circle cx="1030" cy="260" r="360" fill="url(#glow-a7)"/>
+  <circle cx="320" cy="700" r="300" fill="#06b6d4" opacity=".07"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    
+    <g transform="translate(120 120)">
+      <text x="0" y="70" fill="#111827" font-size="70" font-weight="880" opacity="1">Pilates studio</text>
+      <text x="0" y="126" fill="#111827" font-size="38" font-weight="720" opacity="0.68">richieste, vocali e appuntamenti</text>
+      <rect x="0" y="220" width="560" height="520" rx="62" fill="#fff" opacity=".86" filter="url(#softShadow-a7)"/>
+      <rect x="110" y="300" width="300" height="62" rx="31" fill="url(#primary-a7)"/><circle cx="160" cy="250" r="44" fill="#06b6d4"/><path d="M210 252 C260 210 320 210 360 252" stroke="#4338ca" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <g filter="url(#smallShadow-a0)"><rect x="80" y="432" width="310" height="58" rx="29" fill="#4338ca" opacity="1" /><text x="108" y="471" fill="#fff" font-size="22" font-weight="750" opacity="1">Lezione 18:30</text></g>
+    </g>
+    <g transform="translate(980 150) scale(0.78)" filter="url(#softShadow-a7)">
+    <rect x="0" y="0" width="400" height="760" rx="64" fill="#0f172a"/>
+    <rect x="22" y="22" width="356" height="716" rx="50" fill="#f8fafc"/>
+    <rect x="132" y="38" width="136" height="24" rx="12" fill="#0f172a"/>
+    <g transform="translate(22 22)" clip-path="url(#phoneClip-a7)">
+      <rect width="356" height="716" fill="#f1f5f9"/>
+      <rect width="356" height="90" fill="url(#primary-a7)"/>
+      <circle cx="52" cy="48" r="24" fill="#fff" opacity=".92"/>
+      <text x="92" y="56" fill="#fff" font-size="25" font-weight="800">Ambrogio</text>
+      <g>
+    <rect x="30" y="140" width="294" height="92" rx="24" fill="#fff" filter="url(#smallShadow-a0)"/>
+    <text x="54" y="176" fill="#0f172a" font-size="22" font-weight="650">Avete posto oggi?</text>
+  </g><g>
+    <rect x="78" y="266" width="246" height="116" rx="24" fill="#0f766e" filter="url(#smallShadow-a0)"/>
+    <text x="102" y="302" fill="#ffffff" font-size="22" font-weight="650">Si, ti confermo ${slot}.</text>
+  </g><g>
+    <rect x="30" y="430" width="292" height="86" rx="24" fill="#fff" filter="url(#smallShadow-a0)"/>
+    <text x="54" y="466" fill="#0f172a" font-size="22" font-weight="650">Grazie!</text>
+  </g>
+    </g>
+  </g>
+    <path d="M690 500 C790 410 860 390 970 420" stroke="url(#accent-a7)" stroke-width="10" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

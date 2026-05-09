@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
+  "crons": [
+    {
+      "path": "/api/internal/jobs/whatsapp-outbox",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/jobs/whatsapp-voice",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/jobs/whatsapp-template-sync",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/internal/jobs/appointment-reminders",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/internal/jobs/gdpr-hard-delete",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

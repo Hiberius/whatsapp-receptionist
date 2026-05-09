@@ -1,0 +1,106 @@
+{
+  "name": "whatsapp-receptionist",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Open-source AI receptionist for WhatsApp. Books real appointments, transcribes voice messages, integrates with Google Calendar and Stripe. Multi-tenant SaaS starter kit. Crafted in Italy with GDPR built-in.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hiberius/whatsapp-receptionist.git"
+  },
+  "homepage": "https://github.com/Hiberius/whatsapp-receptionist#readme",
+  "bugs": {
+    "url": "https://github.com/Hiberius/whatsapp-receptionist/issues"
+  },
+  "author": {
+    "name": "Christian Calabrò",
+    "url": "https://github.com/Hiberius"
+  },
+  "license": "MIT",
+  "keywords": [
+    "whatsapp",
+    "ai",
+    "receptionist",
+    "chatbot",
+    "saas-starter",
+    "nextjs",
+    "supabase",
+    "anthropic",
+    "claude",
+    "stripe",
+    "elevenlabs",
+    "google-calendar",
+    "gdpr",
+    "italy",
+    "multi-tenant",
+    "open-source",
+    "self-hosted",
+    "appointments",
+    "booking"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "rm -f tsconfig.tsbuildinfo && tsc --noEmit",
+    "lint": "eslint . --max-warnings=60",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:lint": "node scripts/check-rls-migration.mjs",
+    "security:secrets": "gitleaks detect --source . --verbose",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run db:lint",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.67.0",
+    "@elevenlabs/elevenlabs-js": "^2.44.0",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.87.1",
+    "@upstash/ratelimit": "^2.0.7",
+    "@upstash/redis": "^1.35.8",
+    "drizzle-orm": "^0.45.1",
+    "next": "15.5.15",
+    "pino": "^10.1.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "stripe": "^20.1.0",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@types/node": "^25.0.2",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@typescript-eslint/parser": "^8.59.2",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^15.5.15",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "postcss": "^8.5.10",
+    "prettier": "^3.8.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
+  "engines": {
+    "node": ">=22 <23"
+  }
+}
