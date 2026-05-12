@@ -1,10 +1,16 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'Ambrogio.ai — Reception AI sempre attiva';
+export const alt =
+  'WhatsApp Receptionist — open-source AI receptionist that books real appointments';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+/**
+ * Dynamic Open Graph image. Renders with satori — only flex layouts and hex
+ * colors. No oklch(), no emoji glyphs, no SVG dynamic fonts: all rendered as
+ * plain text and CSS-painted shapes.
+ */
 export default function OpengraphImage(): ImageResponse {
   return new ImageResponse(
     <div
@@ -13,8 +19,7 @@ export default function OpengraphImage(): ImageResponse {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background:
-          'linear-gradient(135deg, oklch(95% 0.02 175) 0%, oklch(94% 0.025 175) 60%, oklch(90% 0.04 175) 100%)',
+        background: 'linear-gradient(135deg, #ebf3f2 0%, #e0eceb 60%, #cce0de 100%)',
         padding: '80px',
         fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
@@ -32,7 +37,7 @@ export default function OpengraphImage(): ImageResponse {
             width: '64px',
             height: '64px',
             borderRadius: '16px',
-            background: 'oklch(45% 0.12 175)',
+            background: '#1f6862',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -45,13 +50,14 @@ export default function OpengraphImage(): ImageResponse {
         </div>
         <div
           style={{
+            display: 'flex',
             fontSize: '36px',
             fontWeight: 700,
-            color: 'oklch(20% 0.015 175)',
+            color: '#0d2926',
             letterSpacing: '-0.02em',
           }}
         >
-          Ambrogio<span style={{ color: 'oklch(45% 0.12 175)' }}>.ai</span>
+          WhatsApp Receptionist
         </div>
       </div>
 
@@ -66,27 +72,27 @@ export default function OpengraphImage(): ImageResponse {
       >
         <div
           style={{
+            display: 'flex',
             fontSize: '76px',
             fontWeight: 700,
-            color: 'oklch(20% 0.015 175)',
+            color: '#0d2926',
             letterSpacing: '-0.04em',
             lineHeight: 1.05,
-            maxWidth: '900px',
+            maxWidth: '1040px',
           }}
         >
-          La reception AI
-          <br />
-          che non dorme mai.
+          AI that books real appointments on WhatsApp.
         </div>
         <div
           style={{
+            display: 'flex',
             fontSize: '28px',
-            color: 'oklch(38% 0.018 175)',
-            maxWidth: '850px',
+            color: '#3d524f',
+            maxWidth: '950px',
             lineHeight: 1.4,
           }}
         >
-          WhatsApp, voce, prenotazioni automatiche per studi e PMI italiane.
+          Open source. Multi-tenant. GDPR-ready. Crafted in Italy.
         </div>
       </div>
 
@@ -96,28 +102,29 @@ export default function OpengraphImage(): ImageResponse {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingTop: '32px',
-          borderTop: '1px solid oklch(80% 0.015 150)',
+          borderTop: '1px solid #b8c8c5',
         }}
       >
         <div style={{ display: 'flex', gap: '32px' }}>
-          <div style={{ fontSize: '20px', color: 'oklch(45% 0.12 175)', fontWeight: 600 }}>
-            ● Hosted EU
+          <div style={{ display: 'flex', fontSize: '20px', color: '#1f6862', fontWeight: 600 }}>
+            Hosted EU
           </div>
-          <div style={{ fontSize: '20px', color: 'oklch(45% 0.12 175)', fontWeight: 600 }}>
-            ● GDPR ready
+          <div style={{ display: 'flex', fontSize: '20px', color: '#1f6862', fontWeight: 600 }}>
+            MIT licensed
           </div>
-          <div style={{ fontSize: '20px', color: 'oklch(45% 0.12 175)', fontWeight: 600 }}>
-            ● Beta Italia 2026
+          <div style={{ display: 'flex', fontSize: '20px', color: '#1f6862', fontWeight: 600 }}>
+            369 tests
           </div>
         </div>
         <div
           style={{
+            display: 'flex',
             fontSize: '20px',
-            color: 'oklch(38% 0.018 175)',
+            color: '#3d524f',
             fontWeight: 500,
           }}
         >
-          ambrogio.ai
+          github.com/Hiberius
         </div>
       </div>
     </div>,
