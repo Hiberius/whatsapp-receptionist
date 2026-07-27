@@ -6,7 +6,6 @@ const VERTICALS = ['dental', 'beauty', 'fitness', 'professional'] as const;
 const LEGAL = ['privacy', 'terms', 'dpa', 'cookie', 'security'] as const;
 
 const BLOG_POSTS = [
-  { slug: 'come-uno-studio-dentistico-recupera-12k-anno', date: '2026-05-05' },
   { slug: 'whatsapp-business-vs-360dialog-quando-conviene', date: '2026-05-02' },
   { slug: 'gdpr-receptionist-ai-dpa-template', date: '2026-04-28' },
 ] as const;

@@ -1,294 +1,271 @@
 import type { Metadata } from 'next';
 
-import { FeatureFlagToggle } from '@/components/admin/FeatureFlagToggle';
 import { requireSuperAdmin } from '@/lib/auth/super-admin';
+import { type AppEnv, env } from '@/lib/env';
+import {
+  type HealthCheck,
+  type HealthStatus,
+  overallStatus,
+  runHealthChecks,
+} from '@/lib/health/checks';
+import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import vercelConfig from '../../../../../vercel.json';
 
 export const metadata: Metadata = {
   title: 'Sistema · Admin',
   robots: { index: false, follow: false },
 };
 
-interface EnvVar {
-  name: string;
-  scope: 'public' | 'server' | 'edge';
-  status: 'configured' | 'missing' | 'rotation_pending';
-  rotatedAt: string | null;
+/**
+ * Nessuna cache: un pannello di monitoraggio che serve una misurazione vecchia
+ * afferma qualcosa di falso sul presente.
+ */
+export const dynamic = 'force-dynamic';
+
+// --------------------------------------------------------------------------
+// Configurazione runtime
+// --------------------------------------------------------------------------
+
+interface RuntimeVar {
+  readonly key: keyof AppEnv;
+  readonly area: string;
+  readonly required: boolean;
 }
 
-interface FeatureFlag {
-  key: string;
-  description: string;
-  enabled: boolean;
-  rollout: 'global' | 'tenant_subset' | 'beta';
-  scope: string;
-}
+/**
+ * Variabili di configurazione mostrate nel pannello.
+ *
+ * Ogni chiave esiste nello schema Zod di `src/lib/env.ts`: il pannello riporta
+ * solo se il valore è valorizzato, mai il valore stesso. Le date di rotazione
+ * non compaiono perché il sistema non le registra da nessuna parte.
+ */
+const RUNTIME_VARS: readonly RuntimeVar[] = [
+  { key: 'NEXT_PUBLIC_SUPABASE_URL', area: 'Database', required: true },
+  { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', area: 'Database', required: true },
+  { key: 'SUPABASE_SERVICE_ROLE_KEY', area: 'Database', required: true },
+  { key: 'SUPABASE_DB_URL', area: 'Database', required: false },
+  { key: 'INTERNAL_JOB_SECRET', area: 'Job interni', required: true },
+  { key: 'CRON_SECRET', area: 'Job interni', required: false },
+  { key: 'ANTHROPIC_API_KEY', area: 'Motore AI', required: true },
+  { key: 'ANTHROPIC_MODEL_PRIMARY', area: 'Motore AI', required: true },
+  { key: 'ANTHROPIC_MODEL_FAST', area: 'Motore AI', required: true },
+  { key: 'OPENAI_API_KEY', area: 'Motore AI', required: false },
+  { key: 'UPSTASH_REDIS_REST_URL', area: 'Rate limiting', required: true },
+  { key: 'UPSTASH_REDIS_REST_TOKEN', area: 'Rate limiting', required: true },
+  { key: 'WHATSAPP_API_KEY', area: 'WhatsApp', required: true },
+  { key: 'WHATSAPP_WEBHOOK_HEADER_SECRET', area: 'WhatsApp', required: true },
+  { key: 'WHATSAPP_WEBHOOK_VERIFY_TOKEN', area: 'WhatsApp', required: false },
+  { key: 'ELEVENLABS_API_KEY', area: 'Voce', required: false },
+  { key: 'STRIPE_SECRET_KEY', area: 'Fatturazione', required: true },
+  { key: 'STRIPE_WEBHOOK_SECRET', area: 'Fatturazione', required: true },
+  { key: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', area: 'Fatturazione', required: false },
+  { key: 'STRIPE_PRICE_STARTER', area: 'Fatturazione', required: false },
+  { key: 'STRIPE_PRICE_PROFESSIONAL', area: 'Fatturazione', required: false },
+  { key: 'FATTUREINCLOUD_API_TOKEN', area: 'Fatturazione', required: false },
+  { key: 'FATTUREINCLOUD_COMPANY_ID', area: 'Fatturazione', required: false },
+  { key: 'GOOGLE_OAUTH_CLIENT_ID', area: 'Calendario', required: false },
+  { key: 'GOOGLE_OAUTH_CLIENT_SECRET', area: 'Calendario', required: false },
+  { key: 'GOOGLE_OAUTH_STATE_SECRET', area: 'Calendario', required: false },
+  { key: 'GOOGLE_CALENDAR_REDIRECT_URI', area: 'Calendario', required: false },
+  { key: 'INTEGRATION_CREDENTIALS_ENCRYPTION_KEY', area: 'Calendario', required: false },
+];
 
-interface CronJob {
-  name: string;
-  schedule: string;
-  lastRunAt: string;
-  duration: string;
-  status: 'success' | 'failed' | 'running' | 'idle';
-  description: string;
-}
-
-interface DbTable {
-  name: string;
-  rows: string;
-}
-
-const ENV_VARS: EnvVar[] = [
+/**
+ * Interruttori di comportamento realmente letti a runtime. Sono variabili di
+ * ambiente, non flag persistiti: cambiano solo con un nuovo deploy, quindi qui
+ * sono in sola lettura. Un toggle cliccabile suggerirebbe un controllo che il
+ * sistema non ha.
+ */
+const RUNTIME_SWITCHES: readonly { key: keyof AppEnv; label: string; description: string }[] = [
   {
-    name: 'DATABASE_URL',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '02/04/2026',
+    key: 'AMBROGIO_AI_AUTOREPLY_ENABLED',
+    label: 'Risposta automatica AI',
+    description:
+      'Interruttore globale. Se disattivato nessun tenant riceve risposte automatiche, anche con la risposta automatica abilitata nelle proprie impostazioni.',
   },
   {
-    name: 'SUPABASE_URL',
-    scope: 'public',
-    status: 'configured',
-    rotatedAt: '01/03/2026',
-  },
-  {
-    name: 'SUPABASE_ANON_KEY',
-    scope: 'public',
-    status: 'configured',
-    rotatedAt: '01/03/2026',
-  },
-  {
-    name: 'SUPABASE_SERVICE_ROLE_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '01/03/2026',
-  },
-  {
-    name: 'ANTHROPIC_API_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '15/04/2026',
-  },
-  {
-    name: 'OPENAI_API_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '15/04/2026',
-  },
-  {
-    name: 'STRIPE_SECRET_KEY',
-    scope: 'server',
-    status: 'rotation_pending',
-    rotatedAt: '02/02/2026',
-  },
-  {
-    name: 'STRIPE_WEBHOOK_SECRET',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '02/02/2026',
-  },
-  {
-    name: 'WHATSAPP_CLOUD_TOKEN',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '20/04/2026',
-  },
-  {
-    name: 'ELEVENLABS_API_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '20/04/2026',
-  },
-  {
-    name: 'UPSTASH_REDIS_REST_URL',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '01/03/2026',
-  },
-  {
-    name: 'FATTURE_IN_CLOUD_API_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '15/04/2026',
-  },
-  {
-    name: 'SENTRY_DSN',
-    scope: 'server',
-    status: 'missing',
-    rotatedAt: null,
-  },
-  {
-    name: 'PINECONE_API_KEY',
-    scope: 'server',
-    status: 'configured',
-    rotatedAt: '15/04/2026',
+    key: 'ELEVENLABS_ENABLE_LOGGING',
+    label: 'Logging ElevenLabs',
+    description: 'Consente al provider di conservare gli audio inviati. Rilevante ai fini GDPR.',
   },
 ];
 
-const FEATURE_FLAGS: FeatureFlag[] = [
+function isConfigured(key: keyof AppEnv): boolean {
+  const value = env[key];
+  if (typeof value === 'string') return value.trim().length > 0;
+  return value !== undefined;
+}
+
+// --------------------------------------------------------------------------
+// Cron dichiarati
+// --------------------------------------------------------------------------
+
+interface DeclaredCron {
+  readonly path: string;
+  readonly schedule: string;
+}
+
+/**
+ * Fonte autorevole della pianificazione: `vercel.json`. Importato invece di
+ * essere ricopiato, così una modifica alla schedulazione non può divergere da
+ * quanto mostrato qui.
+ */
+const DECLARED_CRONS: readonly DeclaredCron[] = vercelConfig.crons;
+
+const CRON_PURPOSE: Record<string, string> = {
+  '/api/internal/jobs/whatsapp-outbox':
+    'Consegna i messaggi in uscita accodati in whatsapp_outbox_jobs.',
+  '/api/internal/jobs/whatsapp-voice':
+    'Trascrive i vocali in ingresso accodati in whatsapp_voice_jobs.',
+  '/api/internal/jobs/whatsapp-template-sync':
+    'Allinea i template WhatsApp approvati dal provider per un tenant.',
+  '/api/internal/jobs/appointment-reminders': 'Invia i promemoria degli appuntamenti in scadenza.',
+  '/api/internal/jobs/gdpr-hard-delete':
+    'Esegue la cancellazione definitiva dei tenant oltre il periodo di conservazione (GDPR art. 17).',
+};
+
+/** Traduce le espressioni cron effettivamente usate; altrimenti mostra l'originale. */
+function describeSchedule(expression: string): string {
+  if (expression === '* * * * *') return 'ogni minuto';
+
+  const everyNMinutes = /^\*\/(\d+) \* \* \* \*$/u.exec(expression);
+  const minutesStep = everyNMinutes?.[1];
+  if (minutesStep !== undefined) return `ogni ${minutesStep} minuti`;
+
+  const dailyAt = /^(\d{1,2}) (\d{1,2}) \* \* \*$/u.exec(expression);
+  const minute = dailyAt?.[1];
+  const hour = dailyAt?.[2];
+  if (minute !== undefined && hour !== undefined) {
+    return `ogni giorno alle ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+  }
+
+  return expression;
+}
+
+// --------------------------------------------------------------------------
+// Code di lavoro (unica traccia reale di attività dei worker)
+// --------------------------------------------------------------------------
+
+type QueueTable = 'whatsapp_outbox_jobs' | 'whatsapp_voice_jobs';
+
+interface QueueSnapshot {
+  readonly table: QueueTable;
+  readonly label: string;
+  readonly description: string;
+  readonly pending: number;
+  readonly blocked: number;
+  readonly lastAttemptAt: string | null;
+}
+
+const QUEUES: readonly { table: QueueTable; label: string; description: string }[] = [
   {
-    key: 'voice_replies_enabled',
-    description: 'Risposte vocali ElevenLabs su WhatsApp.',
-    enabled: true,
-    rollout: 'global',
-    scope: 'tutti i tenant',
+    table: 'whatsapp_outbox_jobs',
+    label: 'Messaggi in uscita',
+    description: 'Lavorata dal cron whatsapp-outbox.',
   },
   {
-    key: 'agency_white_label',
-    description: 'White-label per agency con sub-tenant management.',
-    enabled: true,
-    rollout: 'tenant_subset',
-    scope: '4 agency su piano Agency',
-  },
-  {
-    key: 'fatturazione_sdi_auto',
-    description: 'Emissione automatica fatture su SDI tramite Fatture in Cloud.',
-    enabled: true,
-    rollout: 'global',
-    scope: 'tutti i tenant con piano ≥ Professional',
-  },
-  {
-    key: 'ai_fallback_openai',
-    description: 'Fallback automatico OpenAI quando Anthropic latency > 800ms p95.',
-    enabled: true,
-    rollout: 'global',
-    scope: 'tutti i tenant Enterprise',
-  },
-  {
-    key: 'gdpr_self_service_export',
-    description: 'Export self-service GDPR senza approvazione admin.',
-    enabled: false,
-    rollout: 'beta',
-    scope: '7 tenant beta',
-  },
-  {
-    key: 'multi_language_kb',
-    description: 'Knowledge base multilingua (it / en / es / mt).',
-    enabled: true,
-    rollout: 'global',
-    scope: 'tutti i tenant',
-  },
-  {
-    key: 'sms_channel',
-    description: 'Canale SMS (Twilio) come integrazione opzionale.',
-    enabled: false,
-    rollout: 'beta',
-    scope: '0 tenant — feature in dev',
-  },
-  {
-    key: 'analytics_export_csv',
-    description: 'Export CSV report KPI per dashboard.',
-    enabled: true,
-    rollout: 'global',
-    scope: 'tutti i tenant',
+    table: 'whatsapp_voice_jobs',
+    label: 'Trascrizione vocali',
+    description: 'Lavorata dal cron whatsapp-voice.',
   },
 ];
 
-const CRON_JOBS: CronJob[] = [
-  {
-    name: 'billing-reconcile',
-    schedule: '0 3 * * *',
-    lastRunAt: '08/05/2026 03:00:14',
-    duration: '42s',
-    status: 'success',
-    description: 'Riconcilia Stripe charge ↔ Fatture in Cloud per tutti i tenant.',
-  },
-  {
-    name: 'usage-aggregator',
-    schedule: '*/15 * * * *',
-    lastRunAt: '08/05/2026 12:30:01',
-    duration: '8s',
-    status: 'success',
-    description: 'Aggrega contatori usage per tenant (conversazioni, vocali, booking).',
-  },
-  {
-    name: 'gdpr-retention-purge',
-    schedule: '0 4 * * 0',
-    lastRunAt: '04/05/2026 04:00:18',
-    duration: '3m 12s',
-    status: 'success',
-    description: 'Hard-delete dati oltre retention 24 mesi (audit log, conversazioni).',
-  },
-  {
-    name: 'webhook-retry-queue',
-    schedule: '*/5 * * * *',
-    lastRunAt: '08/05/2026 12:35:02',
-    duration: '12s',
-    status: 'failed',
-    description: '4 webhook in coda · 1 errore persistente su tenant t9 (HTTP 502).',
-  },
-  {
-    name: 'kb-reembedding',
-    schedule: '0 2 * * *',
-    lastRunAt: '08/05/2026 02:00:55',
-    duration: '14m 38s',
-    status: 'success',
-    description: 'Re-embedding Pinecone per knowledge base modificate nelle 24h.',
-  },
-  {
-    name: 'health-monitor',
-    schedule: '* * * * *',
-    lastRunAt: '08/05/2026 12:38:00',
-    duration: '2s',
-    status: 'running',
-    description: 'Monitor latency upstream (Anthropic, ElevenLabs, Meta, Stripe).',
-  },
-  {
-    name: 'mrr-snapshot',
-    schedule: '0 0 * * *',
-    lastRunAt: '08/05/2026 00:00:08',
-    duration: '4s',
-    status: 'success',
-    description: 'Snapshot giornaliero MRR per dashboard billing.',
-  },
-];
+function readTimestampField(row: unknown, field: string): string | null {
+  if (typeof row !== 'object' || row === null) return null;
+  const value = (row as Record<string, unknown>)[field];
+  return typeof value === 'string' ? value : null;
+}
 
-const DB_TABLES: DbTable[] = [
-  { name: 'tenants', rows: '47' },
-  { name: 'users', rows: '128' },
-  { name: 'tenant_users', rows: '162' },
-  { name: 'conversations', rows: '38.412' },
-  { name: 'messages', rows: '184.927' },
-  { name: 'bookings', rows: '4.812' },
-  { name: 'knowledge_base_entries', rows: '12.044' },
-  { name: 'audit_log', rows: '8.247' },
-  { name: 'invoices', rows: '914' },
-  { name: 'integrations', rows: '188' },
-  { name: 'webhooks_outbox', rows: '12 (in coda)' },
-  { name: 'feature_flag_overrides', rows: '23' },
-];
+/**
+ * Legge lo stato reale di una coda.
+ *
+ * `last_attempt_at` è l'unico dato che il sistema registra sull'esecuzione dei
+ * worker: non esiste una tabella di run dei cron, quindi questo è il sostituto
+ * onesto di uno storico delle esecuzioni.
+ *
+ * @returns `null` se il database non risponde: l'assenza del dato va mostrata,
+ * non sostituita con uno zero che sembrerebbe una coda vuota.
+ */
+async function loadQueueSnapshot(queue: (typeof QUEUES)[number]): Promise<QueueSnapshot | null> {
+  try {
+    const supabase = createSupabaseAdminClient();
 
-const SCOPE_BADGE = {
-  public: { label: 'public', class: 'badge-warm' },
-  server: { label: 'server', class: 'badge' },
-  edge: { label: 'edge', class: 'badge-neutral' },
-} as const;
+    const [pending, blocked, lastAttempt] = await Promise.all([
+      supabase
+        .from(queue.table)
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['pending', 'processing', 'retry']),
+      supabase
+        .from(queue.table)
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['failed', 'dead_letter']),
+      supabase
+        .from(queue.table)
+        .select('last_attempt_at')
+        .not('last_attempt_at', 'is', null)
+        .order('last_attempt_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-const ENV_STATUS_BADGE = {
-  configured: { label: 'Configurato', class: 'badge-success' },
-  missing: { label: 'Mancante', class: 'badge-danger' },
-  rotation_pending: { label: 'Rotazione attesa', class: 'badge-warm' },
-} as const;
+    if (pending.error || blocked.error || lastAttempt.error) return null;
 
-const CRON_STATUS_BADGE = {
-  success: { label: 'OK', class: 'badge-success' },
-  failed: { label: 'Failed', class: 'badge-danger' },
-  running: { label: 'Running', class: 'badge-warm' },
-  idle: { label: 'Idle', class: 'badge-neutral' },
-} as const;
+    return {
+      table: queue.table,
+      label: queue.label,
+      description: queue.description,
+      pending: pending.count ?? 0,
+      blocked: blocked.count ?? 0,
+      lastAttemptAt: readTimestampField(lastAttempt.data, 'last_attempt_at'),
+    };
+  } catch {
+    return null;
+  }
+}
 
-const ROLLOUT_BADGE = {
-  global: { label: 'Global', class: 'badge-success' },
-  tenant_subset: { label: 'Subset', class: 'badge-warm' },
-  beta: { label: 'Beta', class: 'badge' },
-} as const;
+// --------------------------------------------------------------------------
+// Presentazione
+// --------------------------------------------------------------------------
 
-const TOTAL_ROWS = DB_TABLES.reduce((acc, table) => {
-  const numeric = parseInt(table.rows.replace(/[^0-9]/gu, ''), 10);
-  return acc + (Number.isFinite(numeric) ? numeric : 0);
-}, 0);
+const HEALTH_PRESENTATION: Record<HealthStatus, { label: string; badgeClass: string }> = {
+  ok: { label: 'Operativo', badgeClass: 'badge-success' },
+  degraded: { label: 'Degradato', badgeClass: 'badge-warm' },
+  down: { label: 'Non raggiungibile', badgeClass: 'badge-danger' },
+};
+
+function formatDateTime(iso: string): string {
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return 'non disponibile';
+  return parsed.toLocaleString('it-IT', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+    timeZone: 'Europe/Rome',
+  });
+}
+
+function formatAge(iso: string, now: Date): string {
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return '';
+  const minutes = Math.floor((now.getTime() - parsed.getTime()) / 60_000);
+  if (minutes < 1) return 'meno di un minuto fa';
+  if (minutes < 60) return `${minutes} min fa`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} h fa`;
+  return `${Math.floor(hours / 24)} g fa`;
+}
 
 export default async function AdminSystemPage() {
   await requireSuperAdmin();
+
+  const [checks, queues] = await Promise.all([
+    runHealthChecks(),
+    Promise.all(QUEUES.map((queue) => loadQueueSnapshot(queue))),
+  ]);
+
+  const now = new Date();
+  const overall = HEALTH_PRESENTATION[overallStatus(checks)];
+  const missingRequired = RUNTIME_VARS.filter((item) => item.required && !isConfigured(item.key));
+  const configuredCount = RUNTIME_VARS.filter((item) => isConfigured(item.key)).length;
 
   return (
     <div className="stack stack-8">
@@ -296,58 +273,77 @@ export default async function AdminSystemPage() {
         <span className="badge badge-warm">Cross-tenant</span>
         <h1>Sistema</h1>
         <p className="muted">
-          Configurazione runtime, feature flags, cron e database. Modifiche applicate live —
-          attenzione.
+          Stato misurato delle dipendenze, configurazione runtime e code di lavoro. Ogni valore in
+          questa pagina è rilevato al caricamento: nulla è dichiarato a mano.
         </p>
       </div>
 
       <section className="card stack stack-4">
         <div className="row-between">
-          <h2 style={{ fontSize: 'var(--text-xl)' }}>Env config</h2>
+          <h2 style={{ fontSize: 'var(--text-xl)' }}>Dipendenze esterne</h2>
+          <span className={`badge ${overall.badgeClass}`}>{overall.label}</span>
+        </div>
+        <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+          Probe eseguite alle {formatDateTime(now.toISOString())} (fuso Europe/Rome). Stesso dato in
+          formato macchina su <span className="mono">/api/health/deep</span>.
+        </p>
+
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }} className="stack stack-2">
+          {checks.map((check) => (
+            <HealthRow key={check.name} check={check} />
+          ))}
+        </ul>
+      </section>
+
+      <section className="card stack stack-4">
+        <div className="row-between">
+          <h2 style={{ fontSize: 'var(--text-xl)' }}>Configurazione runtime</h2>
           <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-            {ENV_VARS.filter((v) => v.status === 'configured').length} configurate ·{' '}
-            {ENV_VARS.filter((v) => v.status === 'missing').length} mancanti ·{' '}
-            {ENV_VARS.filter((v) => v.status === 'rotation_pending').length} rotazione
+            {configuredCount} su {RUNTIME_VARS.length} valorizzate
+            {missingRequired.length > 0 ? ` · ${missingRequired.length} richieste mancanti` : ''}
           </span>
         </div>
+        <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+          Il pannello mostra solo se una variabile è valorizzata, mai il suo contenuto. La data
+          dell&apos;ultima rotazione non compare perché il sistema non la registra.
+        </p>
+
         <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
             <caption className="sr-only">
-              Variabili di ambiente runtime con scope, stato di configurazione e data ultima
-              rotazione.
+              Variabili di configurazione runtime con area funzionale e stato di valorizzazione.
             </caption>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
-                <Th>Nome variabile</Th>
-                <Th>Scope</Th>
+                <Th>Variabile</Th>
+                <Th>Area</Th>
                 <Th>Stato</Th>
-                <Th>Ultima rotazione</Th>
               </tr>
             </thead>
             <tbody>
-              {ENV_VARS.map((envVar) => {
-                const scope = SCOPE_BADGE[envVar.scope];
-                const status = ENV_STATUS_BADGE[envVar.status];
+              {RUNTIME_VARS.map((item) => {
+                const configured = isConfigured(item.key);
+                const badgeClass = configured
+                  ? 'badge-success'
+                  : item.required
+                    ? 'badge-danger'
+                    : 'badge-neutral';
+                const label = configured
+                  ? 'Valorizzata'
+                  : item.required
+                    ? 'Mancante'
+                    : 'Non configurata';
                 return (
-                  <tr key={envVar.name} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                  <tr key={item.key} style={{ borderBottom: '1px solid var(--color-border)' }}>
                     <Td>
                       <span className="mono" style={{ fontWeight: 600 }}>
-                        {envVar.name}
+                        {item.key}
                       </span>
                     </Td>
+                    <Td muted>{item.area}</Td>
                     <Td>
-                      <span className={`badge ${scope.class}`}>{scope.label}</span>
+                      <span className={`badge ${badgeClass}`}>{label}</span>
                     </Td>
-                    <Td>
-                      <span className={`badge ${status.class}`}>{status.label}</span>
-                    </Td>
-                    <Td muted>{envVar.rotatedAt ?? '—'}</Td>
                   </tr>
                 );
               })}
@@ -357,49 +353,38 @@ export default async function AdminSystemPage() {
       </section>
 
       <section className="card stack stack-4">
-        <div className="row-between">
-          <h2 style={{ fontSize: 'var(--text-xl)' }}>Feature flags</h2>
-          <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-            {FEATURE_FLAGS.filter((f) => f.enabled).length} attive · {FEATURE_FLAGS.length} totali
-          </span>
-        </div>
+        <h2 style={{ fontSize: 'var(--text-xl)' }}>Interruttori di comportamento</h2>
+        <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+          Definiti da variabili di ambiente e letti a ogni richiesta. Sono in sola lettura: si
+          cambiano con un nuovo deploy, non da questa pagina.
+        </p>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }} className="stack stack-2">
-          {FEATURE_FLAGS.map((flag) => {
-            const rollout = ROLLOUT_BADGE[flag.rollout];
+          {RUNTIME_SWITCHES.map((item) => {
+            const enabled = env[item.key] === true;
             return (
               <li
-                key={flag.key}
+                key={item.key}
                 className="surface-flat"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr auto auto',
+                  gridTemplateColumns: '1fr auto',
                   gap: 'var(--space-4)',
                   alignItems: 'center',
                   padding: 'var(--space-4) var(--space-5)',
                 }}
               >
                 <div className="stack stack-2">
-                  <span className="mono" style={{ fontWeight: 600 }}>
-                    {flag.key}
+                  <span style={{ fontWeight: 600 }}>{item.label}</span>
+                  <span className="mono muted" style={{ fontSize: 'var(--text-xs)' }}>
+                    {item.key}
                   </span>
                   <span className="muted" style={{ fontSize: 'var(--text-sm)' }}>
-                    {flag.description}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 'var(--text-xs)',
-                      color: 'var(--color-text-secondary)',
-                    }}
-                  >
-                    Scope: {flag.scope}
+                    {item.description}
                   </span>
                 </div>
-                <span className={`badge ${rollout.class}`}>{rollout.label}</span>
-                <FeatureFlagToggle
-                  flagKey={flag.key}
-                  description={flag.description}
-                  initialEnabled={flag.enabled}
-                />
+                <span className={`badge ${enabled ? 'badge-success' : 'badge-neutral'}`}>
+                  {enabled ? 'Attivo' : 'Disattivo'}
+                </span>
               </li>
             );
           })}
@@ -408,141 +393,189 @@ export default async function AdminSystemPage() {
 
       <section className="card stack stack-4">
         <div className="row-between">
-          <h2 style={{ fontSize: 'var(--text-xl)' }}>Background jobs</h2>
+          <h2 style={{ fontSize: 'var(--text-xl)' }}>Job schedulati</h2>
           <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-            {CRON_JOBS.filter((j) => j.status === 'success').length} OK ·{' '}
-            {CRON_JOBS.filter((j) => j.status === 'failed').length} failed ·{' '}
-            {CRON_JOBS.filter((j) => j.status === 'running').length} running
+            {DECLARED_CRONS.length} job dichiarati
           </span>
         </div>
+        <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+          Questa tabella riporta la <strong>pianificazione dichiarata</strong> in{' '}
+          <span className="mono">vercel.json</span>, non l&apos;esito dell&apos;ultima esecuzione:
+          il sistema non registra uno storico dei run. L&apos;unica traccia reale di attività dei
+          worker è nella sezione Code di lavoro qui sotto.
+        </p>
+
         <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
             <caption className="sr-only">
-              Background job schedulati con cron schedule, durata e stato dell&apos;ultima
-              esecuzione.
+              Job cron dichiarati nella configurazione di deploy con la relativa pianificazione.
             </caption>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
-                <Th>Job</Th>
-                <Th>Schedule</Th>
-                <Th>Ultima esecuzione</Th>
-                <Th>Durata</Th>
-                <Th>Stato</Th>
+                <Th>Endpoint</Th>
+                <Th>Pianificazione</Th>
+                <Th>Frequenza</Th>
               </tr>
             </thead>
             <tbody>
-              {CRON_JOBS.map((job) => {
-                const status = CRON_STATUS_BADGE[job.status];
-                return (
-                  <tr key={job.name} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                    <Td>
-                      <div className="stack stack-2">
-                        <span className="mono" style={{ fontWeight: 600 }}>
-                          {job.name}
-                        </span>
-                        <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-                          {job.description}
-                        </span>
-                      </div>
-                    </Td>
-                    <Td mono>{job.schedule}</Td>
-                    <Td muted>{job.lastRunAt}</Td>
-                    <Td mono>{job.duration}</Td>
-                    <Td>
-                      <span className={`badge ${status.class}`}>{status.label}</span>
-                    </Td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="card stack stack-4">
-        <div className="row-between">
-          <h2 style={{ fontSize: 'var(--text-xl)' }}>Database</h2>
-          <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-            Postgres 16 · Supabase EU-central · ultima migration{' '}
-            <span className="mono">20260507_add_voice_quota_columns.sql</span> applicata 07/05
-          </span>
-        </div>
-
-        <div className="kpi-grid" style={{ marginBottom: 0 }}>
-          <article className="kpi">
-            <span className="kpi-label">Tabelle</span>
-            <span className="kpi-value">{DB_TABLES.length}</span>
-          </article>
-          <article className="kpi">
-            <span className="kpi-label">Righe totali</span>
-            <span className="kpi-value">{TOTAL_ROWS.toLocaleString('it-IT')}</span>
-          </article>
-          <article className="kpi">
-            <span className="kpi-label">Migrations applicate</span>
-            <span className="kpi-value">42</span>
-            <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-              ultima 07/05/2026
-            </span>
-          </article>
-          <article className="kpi">
-            <span className="kpi-label">Storage usato</span>
-            <span className="kpi-value">8,2 GB</span>
-            <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-              su 100 GB · 8,2%
-            </span>
-          </article>
-        </div>
-
-        <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
-            <caption className="sr-only">
-              Tabelle del database con conteggio righe correnti.
-            </caption>
-            <thead>
-              <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
-                <Th>Tabella</Th>
-                <Th align="right">Righe</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {DB_TABLES.map((table) => (
-                <tr key={table.name} style={{ borderBottom: '1px solid var(--color-border)' }}>
+              {DECLARED_CRONS.map((cron) => (
+                <tr key={cron.path} style={{ borderBottom: '1px solid var(--color-border)' }}>
                   <Td>
-                    <span className="mono">{table.name}</span>
+                    <div className="stack stack-2">
+                      <span className="mono" style={{ fontWeight: 600 }}>
+                        {cron.path}
+                      </span>
+                      {CRON_PURPOSE[cron.path] ? (
+                        <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+                          {CRON_PURPOSE[cron.path]}
+                        </span>
+                      ) : null}
+                    </div>
                   </Td>
-                  <Td align="right" mono>
-                    {table.rows}
-                  </Td>
+                  <Td mono>{cron.schedule}</Td>
+                  <Td muted>{describeSchedule(cron.schedule)}</Td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+
+      <section className="card stack stack-4">
+        <h2 style={{ fontSize: 'var(--text-xl)' }}>Code di lavoro</h2>
+        <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
+          Conteggi letti dalle tabelle di coda. Se l&apos;ultimo tentativo è molto più vecchio della
+          frequenza del cron corrispondente, il worker non sta girando.
+        </p>
+
+        <div className="stack stack-3">
+          {queues.map((snapshot, index) => {
+            const queue = QUEUES[index];
+            if (queue === undefined) return null;
+            return <QueueCard key={queue.table} queue={queue} snapshot={snapshot} now={now} />;
+          })}
+        </div>
+      </section>
     </div>
   );
 }
 
-function Th({
-  children,
-  align,
-}: Readonly<{ children: React.ReactNode; align?: 'left' | 'right' }>) {
+function HealthRow({ check }: Readonly<{ check: HealthCheck }>) {
+  const presentation = HEALTH_PRESENTATION[check.status];
+  return (
+    <li
+      className="surface-flat"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto auto',
+        gap: 'var(--space-4)',
+        alignItems: 'center',
+        padding: 'var(--space-3) var(--space-5)',
+      }}
+    >
+      <div className="stack stack-2">
+        <span style={{ fontWeight: 500 }}>{check.label}</span>
+        {check.details ? (
+          <span className="mono muted" style={{ fontSize: 'var(--text-xs)' }}>
+            {check.details}
+          </span>
+        ) : null}
+      </div>
+      <span className="mono muted" style={{ fontSize: 'var(--text-xs)' }}>
+        {check.latencyMs === undefined ? '—' : `${check.latencyMs} ms`}
+      </span>
+      <span className={`badge ${presentation.badgeClass}`}>{presentation.label}</span>
+    </li>
+  );
+}
+
+function QueueCard({
+  queue,
+  snapshot,
+  now,
+}: Readonly<{
+  queue: (typeof QUEUES)[number];
+  snapshot: QueueSnapshot | null;
+  now: Date;
+}>) {
+  if (snapshot === null) {
+    return (
+      <div className="surface-flat" style={{ padding: 'var(--space-4) var(--space-5)' }}>
+        <div className="stack stack-2">
+          <span style={{ fontWeight: 600 }}>{queue.label}</span>
+          <span className="muted" style={{ fontSize: 'var(--text-sm)' }}>
+            Conteggi non disponibili: la tabella <span className="mono">{queue.table}</span> non ha
+            risposto. Verifica lo stato del database nella sezione Dipendenze esterne.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  const isIdle = snapshot.pending === 0 && snapshot.blocked === 0;
+
+  return (
+    <div className="surface-flat" style={{ padding: 'var(--space-4) var(--space-5)' }}>
+      <div className="stack stack-3">
+        <div className="row-between">
+          <div className="stack stack-2">
+            <span style={{ fontWeight: 600 }}>{queue.label}</span>
+            <span className="mono muted" style={{ fontSize: 'var(--text-xs)' }}>
+              {queue.table} · {queue.description}
+            </span>
+          </div>
+          {snapshot.blocked > 0 ? (
+            <span className="badge badge-danger">{snapshot.blocked} bloccati</span>
+          ) : null}
+        </div>
+
+        <div className="row" style={{ gap: 'var(--space-6)', flexWrap: 'wrap' }}>
+          <QueueStat label="In coda" value={String(snapshot.pending)} />
+          <QueueStat label="Falliti o dead letter" value={String(snapshot.blocked)} />
+          <QueueStat
+            label="Ultimo tentativo registrato"
+            value={
+              snapshot.lastAttemptAt === null
+                ? 'mai'
+                : `${formatDateTime(snapshot.lastAttemptAt)} · ${formatAge(snapshot.lastAttemptAt, now)}`
+            }
+          />
+        </div>
+
+        {isIdle && snapshot.lastAttemptAt === null ? (
+          <p className="muted" style={{ fontSize: 'var(--text-sm)' }}>
+            Nessun lavoro mai transitato in questa coda. È lo stato atteso finché non arriva il
+            primo messaggio WhatsApp su un tenant configurato.
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function QueueStat({ label, value }: Readonly<{ label: string; value: string }>) {
+  return (
+    <div className="stack stack-2">
+      <span
+        className="muted"
+        style={{
+          fontSize: 'var(--text-xs)',
+          letterSpacing: 'var(--tracking-wider)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>{value}</span>
+    </div>
+  );
+}
+
+function Th({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <th
       style={{
-        textAlign: align ?? 'left',
+        textAlign: 'left',
         padding: 'var(--space-3) var(--space-4)',
         fontWeight: 600,
         fontSize: 'var(--text-xs)',
@@ -560,12 +593,10 @@ function Td({
   children,
   mono,
   muted,
-  align,
 }: Readonly<{
   children: React.ReactNode;
   mono?: boolean;
   muted?: boolean;
-  align?: 'left' | 'right';
 }>) {
   const className = [mono ? 'mono' : null, muted ? 'muted' : null].filter(Boolean).join(' ');
   return (
@@ -574,7 +605,7 @@ function Td({
       style={{
         padding: 'var(--space-3) var(--space-4)',
         fontSize: mono || muted ? 'var(--text-xs)' : 'var(--text-sm)',
-        textAlign: align ?? 'left',
+        textAlign: 'left',
       }}
     >
       {children}

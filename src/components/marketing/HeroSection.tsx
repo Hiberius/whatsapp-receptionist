@@ -36,16 +36,16 @@ export function HeroSection() {
             }}
           >
             <div className="stat">
-              <span className="stat-value">24h</span>
-              <span className="stat-label">Setup completo</span>
+              <span className="stat-value">24/7</span>
+              <span className="stat-label">Sempre in ascolto</span>
             </div>
             <div className="stat">
-              <span className="stat-value">+38%</span>
-              <span className="stat-label">Booking notturni</span>
+              <span className="stat-value">EU</span>
+              <span className="stat-label">Dati in Europa</span>
             </div>
             <div className="stat">
-              <span className="stat-value">€0</span>
-              <span className="stat-label">Mancate risposte</span>
+              <span className="stat-value">MIT</span>
+              <span className="stat-label">Codice open source</span>
             </div>
           </div>
         </div>

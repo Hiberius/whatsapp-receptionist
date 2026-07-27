@@ -139,7 +139,9 @@ export class SupabaseSignUpRepository implements SignUpRepository {
 }
 
 export function createSignUpService(): SignUpService {
-  const redirectTo = `${env.NEXT_PUBLIC_APP_URL}/auth/callback`;
+  // Chi arriva dalla registrazione non ha ancora un tenant configurato:
+  // il magic link deve portarlo all'onboarding, non alla dashboard vuota.
+  const redirectTo = `${env.NEXT_PUBLIC_APP_URL}/auth/callback?next=%2Fonboarding`;
   const sender: MagicLinkSender = {
     async send(input) {
       const supabase = createSupabaseAdminClient();

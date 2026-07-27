@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { buildBreadcrumbSchema, JsonLd, organizationSchema } from '@/components/marketing/JsonLd';
 import { SiteFooter } from '@/components/marketing/SiteFooter';
 import { SiteHeader } from '@/components/marketing/SiteHeader';
+import { ContactForm } from '@/components/forms/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contatti · Parla con il team Ambrogio.ai',
@@ -54,113 +55,7 @@ export default function ContactPage() {
                 </p>
               </div>
 
-              <form action="/api/contact" method="POST" className="card card-padded stack stack-5">
-                <div
-                  role="status"
-                  aria-live="polite"
-                  id="contact-form-errors"
-                  className="sr-only"
-                />
-
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--space-4)',
-                  }}
-                >
-                  <div className="field">
-                    <label htmlFor="name" className="label">
-                      Nome
-                    </label>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      autoComplete="name"
-                      className="input"
-                      placeholder="Mario Rossi"
-                    />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="email" className="label">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      className="input"
-                      placeholder="mario@studio.it"
-                    />
-                  </div>
-                </div>
-
-                <div className="field">
-                  <label htmlFor="company" className="label">
-                    Studio o azienda
-                  </label>
-                  <input
-                    id="company"
-                    name="company"
-                    type="text"
-                    autoComplete="organization"
-                    className="input"
-                  />
-                </div>
-
-                <div className="field">
-                  <label htmlFor="topic" className="label">
-                    Di cosa vuoi parlare?
-                  </label>
-                  <select id="topic" name="topic" className="select" defaultValue="">
-                    <option value="" disabled>
-                      Seleziona
-                    </option>
-                    <option value="sales">Voglio provare Ambrogio</option>
-                    <option value="support">Ho bisogno di supporto</option>
-                    <option value="agency">Sono un&apos;agenzia / partner</option>
-                    <option value="press">Stampa / media</option>
-                    <option value="other">Altro</option>
-                  </select>
-                </div>
-
-                <div className="field">
-                  <label htmlFor="message" className="label">
-                    Messaggio
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={6}
-                    className="textarea"
-                    placeholder="Raccontaci."
-                  />
-                </div>
-
-                <div className="row" style={{ gap: 'var(--space-2)', alignItems: 'flex-start' }}>
-                  <input id="consent" name="consent" type="checkbox" required />
-                  <label
-                    htmlFor="consent"
-                    className="muted"
-                    style={{ fontSize: 'var(--text-sm)', lineHeight: 1.5 }}
-                  >
-                    Acconsento al trattamento dei dati per finalità di contatto come descritto nella{' '}
-                    <a href="/legal/privacy" className="btn-link">
-                      privacy policy
-                    </a>
-                    .
-                  </label>
-                </div>
-
-                <button type="submit" className="btn btn-primary btn-lg">
-                  Invia messaggio
-                </button>
-              </form>
+              <ContactForm />
 
               <address
                 className="card stack stack-3"

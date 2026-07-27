@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { buildHowToEnrichedSchema, JsonLd } from '@/components/marketing/JsonLd';
+import { OnboardingForm } from '@/components/onboarding/OnboardingForm';
 
 export const metadata: Metadata = {
   title: 'Onboarding · Ambrogio.ai',
@@ -218,106 +219,12 @@ export default async function OnboardingPage({ searchParams }: Readonly<Onboardi
             </p>
           </div>
 
-          <form action="/api/onboarding/tenant" method="POST" className="stack stack-5">
-            <div role="status" aria-live="polite" id="onboarding-form-errors" className="sr-only" />
-
-            <div className="field">
-              <label htmlFor="business_name" className="label">
-                Nome studio o azienda
-              </label>
-              <input
-                id="business_name"
-                name="business_name"
-                type="text"
-                autoComplete="organization"
-                required
-                placeholder="Studio Dentistico Rossi"
-                className="input"
-                defaultValue={prefilledBusinessName}
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="vertical" className="label">
-                Settore
-              </label>
-              <select
-                id="vertical"
-                name="vertical"
-                required
-                className="select"
-                defaultValue={prefilledVertical}
-              >
-                <option value="" disabled>
-                  Seleziona il settore
-                </option>
-                {VERTICALS.map((v) => (
-                  <option key={v.value} value={v.value}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 'var(--space-4)',
-              }}
-            >
-              <div className="field">
-                <label htmlFor="timezone" className="label">
-                  Fuso orario
-                </label>
-                <select
-                  id="timezone"
-                  name="timezone"
-                  required
-                  className="select"
-                  defaultValue="Europe/Rome"
-                >
-                  {TIMEZONES.map((tz) => (
-                    <option key={tz.value} value={tz.value}>
-                      {tz.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="field">
-                <label htmlFor="locale" className="label">
-                  Lingua
-                </label>
-                <select id="locale" name="locale" required className="select" defaultValue="it-IT">
-                  <option value="it-IT">Italiano</option>
-                  <option value="en-US">English</option>
-                </select>
-              </div>
-            </div>
-
-            <p
-              className="helper"
-              style={{
-                background: 'var(--color-accent-soft)',
-                padding: 'var(--space-3) var(--space-4)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-text-secondary)',
-              }}
-            >
-              <strong>P.IVA e codice SDI</strong> li chiediamo dopo, alla prima fattura. Adesso
-              bastano i dati base: 30 secondi.
-            </p>
-
-            <div className="row" style={{ gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
-              <button type="submit" className="btn btn-primary btn-lg">
-                Continua →
-              </button>
-              <button type="button" className="btn btn-ghost" disabled>
-                Indietro
-              </button>
-            </div>
-          </form>
+          <OnboardingForm
+            verticals={VERTICALS}
+            timezones={TIMEZONES}
+            prefilledBusinessName={prefilledBusinessName}
+            prefilledVertical={prefilledVertical}
+          />
         </div>
 
         <p

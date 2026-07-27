@@ -8,12 +8,81 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ### Planned
 
+- **Tenant isolation proven in CI** — seed two tenants against a real Supabase instance and assert A cannot read B. Highest-priority open item.
+- **Error tracking** (Sentry) and a health watchdog for the outbox
+- **Data retention job**, matching the 24-month retention the privacy policy already states
+- Resource/operator entity (a practice with two chairs cannot be modelled today) and team invitations
+- Move AI generation out of the webhook into a dedicated outbox job
+- Prompt caching and a per-tenant AI cost ceiling
+- Prompt injection defences and a much larger AI evaluation set
 - Hosted public live demo with sandbox WhatsApp number
 - Telegram + Instagram DM channels (single orchestrator, multiple transports)
-- Native voice calls (ElevenLabs Conversational + Twilio)
 - Outlook Calendar provider as alternative to Google
-- German + French i18n
 - Real PNG screenshots (replacing the SVG placeholders in `docs/screenshots/`)
+
+See [`docs/PROJECT-STATUS.md`](docs/PROJECT-STATUS.md) for the full, verifiable breakdown.
+
+---
+
+## [0.2.0] · Production hardening · 2026-07-27
+
+The release that turns a well-built backend into a product a customer can actually use.
+
+Produced with **Claude Opus 5 in ultracode mode**: an eight-dimension audit in which every auditor
+was followed by an adversarial verifier instructed to refute its findings, then two parallel
+implementation workflows — 31 agents in total. The six gravest findings were additionally verified
+by hand before any code was written. Full audit, including findings deliberately *not* acted on:
+[`docs/audit/2026-07-27-audit-prodotto.md`](docs/audit/2026-07-27-audit-prodotto.md).
+
+### Fixed — the product did not work end to end
+
+- **Vercel cron jobs never executed.** `vercel.json` scheduled five jobs while the routes exported only `POST`; Vercel Cron invokes with `GET`, so every run returned 405. The WhatsApp outbox was never drained and the product was silently mute in production. Added `GET` handlers plus shared auth accepting both Vercel's `Authorization: Bearer` and the self-hosted custom header, with timing-safe comparison on both.
+- **Nobody could sign up or log in.** All four public forms posted `application/x-www-form-urlencoded` to routes that `JSON.parse` the raw body. Converted to JSON submission with real inline error feedback.
+- **`/auth/callback` did not exist**, despite already being configured as the magic-link `emailRedirectTo` — every login email led to a 404. Implemented, handling both the PKCE and token-hash flows, with open-redirect validation on `next`.
+- **The authenticated area had no auth guard.** `(dashboard)/layout.tsx` was 12 lines without `requireSession`; middleware only handled CSP. Guards now live in the layouts.
+- **No tenant could receive messages.** `whatsapp_360dialog` had seven reads and zero writes: no code path created the `integrations` row the webhook resolves tenants by. Added a provisioning service and UI.
+- **The dashboard displayed no real data.** Fifteen pages were static mocks; no component called any of the API routes. Now wired to the existing, already-tested services.
+- **Onboarding field names did not match the API schema** (`business_name` vs `tenantName`), so submissions would have failed validation even in JSON.
+- **`checkStripe` queried `api.stripe.com/v1`**, which returns 404 for any key, and therefore reported a revoked key as healthy. Now uses the authenticated `/v1/balance`.
+
+### Fixed — security
+
+- **Cross-tenant WhatsApp hijack.** The schema has no unique constraint on `(provider, external_account_id)`, so a tenant could claim another tenant's `phone_number_id` and receive their conversations. Ownership is now verified before write, with a deliberately generic error that does not disclose the owning tenant.
+- **Single global WhatsApp API key for all tenants.** Every customer would have replied from the same number, sharing brand identity, quota and ban risk. Credentials are now resolved per tenant, cached with a TTL, and invalidated on auth failure and on connect/disconnect.
+- **Tenant prompts could delete the safety rules.** A custom persona *replaced* the system prompt, silently removing the prohibitions on medical diagnosis and unkeepable promises. Composition is now `[safety, persona, output]` with immutable sections.
+- **Open redirect** on the post-login `next` parameter.
+- **Seven high-severity dependency vulnerabilities → zero in production.** Next.js 15.5.18 → 15.5.22 (SSRF in Server Actions on custom servers, App Router DoS), plus overrides for postcss, sharp, ws, js-yaml and vite. One dev-only advisory is accepted with a written reopening condition in [`docs/SECURITY-AUDIT-NOTES.md`](docs/SECURITY-AUDIT-NOTES.md).
+
+### Removed — unverifiable public claims
+
+The site published invented data as if measured. All of it is gone:
+
+- A hardcoded `aggregateRating` of 4.9/5 over 24 reviews in the `SoftwareApplication` JSON-LD, plus the placeholder reviews that backed it — a Google structured-data policy violation as well as a consumer-protection one
+- A case study crediting €12,400 in recovered revenue, and the blog post that narrated it
+- The `/about` origin story built on the same numbers
+- Fabricated outcome metrics on all four vertical pages and their OG images
+- Fabricated uptime percentages and incident history on `/status`, now replaced by real dependency probes
+- Fabricated MRR, paying-customer counts, tenant and user lists, and **audit log entries** in the admin panel — the last being the gravest, since an audit log exists to evidence what actually happened
+
+### Added
+
+- **Human escalation.** `escalated` previously existed only as a type and was never written; `human_escalation_email` was stored and never read. A message saying "severe pain" received silence. Now: status change, operator email with context and deep link, and a reply telling the customer a human is coming.
+- **Transactional email.** `email-templates.ts` was 223 lines of dead code. Added a Resend sender and a no-op sender that logs instead of delivering, so development does not break without an API key.
+- **`fetchWithTimeout`.** No server-side HTTP call had a timeout; inside the WhatsApp webhook a slow dependency delayed the response to Meta until retry. Composes with the caller's existing signal instead of discarding it.
+- **Tenant-editable AI persona**, versioned on the existing `ai_prompts` table.
+- **Business hours and services configuration** — the data the AI computes availability from.
+- **Knowledge base management.** Without it the pgvector RAG stayed empty by construction, leaving the AI with no source of truth about the tenant's business.
+- **Conversations inbox with operator reply**, respecting WhatsApp's 24-hour service window and opt-out state.
+- **56 Playwright E2E tests** covering exactly the flows that broke here: authenticated-area redirects, forms posting JSON without navigating, public pages free of console errors. They run without production secrets — an E2E suite that needs real credentials never runs.
+- `loading.tsx` and `error.tsx` for the dashboard and admin segments.
+- CI: a `dependency-audit` job, and `continue-on-error` removed from the gitleaks scan — a gate that cannot fail is not a gate.
+
+### Changed
+
+- **Italian date and time understanding.** "alle 3 del pomeriggio" parsed as 03:00, "il 15 maggio" was ignored, captured minutes were discarded. Time-of-day markers are now evaluated before the exact hour, and the evaluation set covers colloquial phrasings plus inputs containing no date at all, which must return nothing rather than guess.
+- Voice media downloads now pass `tenantId`, instead of using the global key.
+- README and roadmap claimed "Meta WhatsApp Cloud API" while the code uses 360dialog (`waba-v2.360dialog.io`). 360dialog is an official Meta BSP, so the substance held, but the name did not.
+- Test suite: 369 → **521**.
 
 ---
 

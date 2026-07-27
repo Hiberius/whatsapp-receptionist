@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-receptionist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Open-source AI receptionist for WhatsApp. Books real appointments, transcribes voice messages, integrates with Google Calendar and Stripe. Multi-tenant SaaS starter kit. Crafted in Italy with GDPR built-in.",
@@ -50,6 +50,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
     "db:lint": "node scripts/check-rls-migration.mjs",
     "security:secrets": "gitleaks detect --source . --verbose",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run db:lint",
@@ -72,7 +75,7 @@
     "@upstash/ratelimit": "^2.0.7",
     "@upstash/redis": "^1.35.8",
     "drizzle-orm": "^0.45.1",
-    "next": "15.5.18",
+    "next": "15.5.22",
     "pino": "^10.1.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -81,6 +84,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^25.0.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -88,18 +92,22 @@
     "@typescript-eslint/parser": "^8.59.2",
     "@vitest/coverage-v8": "^4.1.6",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^15.5.15",
+    "eslint-config-next": "15.5.22",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.23",
     "prettier": "^3.8.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   },
   "overrides": {
-    "postcss": "^8.5.10"
+    "postcss": "^8.5.23",
+    "sharp": "^0.35.3",
+    "ws": "^8.21.1",
+    "js-yaml": "^4.3.0",
+    "vite": "^7.1.13"
   },
   "engines": {
     "node": ">=22 <23"

@@ -118,6 +118,11 @@ export class WhatsAppVoicePipelineWorker {
       const media = await this.mediaDownloader.downloadMedia({
         mediaId: job.mediaId,
         expectedMimeType: job.mediaMimeType,
+        // Senza `tenantId` il downloader ricade sulla chiave WhatsApp globale:
+        // il media di un tenant verrebbe scaricato con le credenziali di un
+        // altro, e su un account 360dialog diverso da quello proprietario la
+        // richiesta fallisce.
+        tenantId: job.tenantId,
       });
       const stored = await this.mediaStorage.storeVoiceMedia({
         tenantId: job.tenantId,

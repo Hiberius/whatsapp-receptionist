@@ -25,15 +25,6 @@ export const metadata: Metadata = {
 
 const POSTS = [
   {
-    slug: 'come-uno-studio-dentistico-recupera-12k-anno',
-    title: 'Come uno studio dentistico recupera €12k/anno con la reception AI',
-    excerpt:
-      'Caso reale: Studio Dentistico Rossi di Milano, 38% di booking notturni in più nei primi 90 giorni.',
-    date: '5 maggio 2026',
-    readTime: '6 min',
-    category: 'Case study',
-  },
-  {
     slug: 'whatsapp-business-vs-360dialog-quando-conviene',
     title: 'WhatsApp Cloud API vs 360dialog: quando conviene cosa',
     excerpt: 'Confronto tecnico ed economico tra l’API ufficiale Meta e i BSP italiani più usati.',

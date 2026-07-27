@@ -63,8 +63,8 @@ export const VERTICALS_DATA: Record<string, VerticalContent> = {
         body: '“Quanto costa l’apparecchio?” Ambrogio raccoglie info pre-anamnesi, fissa visita conoscitiva con materiali pronti.',
       },
     ],
-    metric: { value: '+34%', label: 'Booking notturni vs reception umana' },
-    relatedBlogSlug: 'come-uno-studio-dentistico-recupera-12k-anno',
+    metric: { value: '24/7', label: 'Risponde e prenota anche fuori orario' },
+    relatedBlogSlug: null,
   },
   beauty: {
     slug: 'beauty',
@@ -107,7 +107,7 @@ export const VERTICALS_DATA: Record<string, VerticalContent> = {
         body: '“È ancora valida la promo abbronzante?” Ambrogio controlla scadenze, condizioni, e prenota.',
       },
     ],
-    metric: { value: '-68%', label: 'Riduzione no-show' },
+    metric: { value: 'Auto', label: 'Promemoria prima di ogni appuntamento' },
     relatedBlogSlug: null,
   },
   fitness: {
@@ -151,7 +151,7 @@ export const VERTICALS_DATA: Record<string, VerticalContent> = {
         body: '“Vorrei i lunedì alle 18 con Marco.” Ambrogio crea slot ricorrenti su Google Calendar di Marco.',
       },
     ],
-    metric: { value: '+22%', label: 'Aumento attendance lezioni' },
+    metric: { value: 'Live', label: 'Posti e disponibilità sempre aggiornati' },
     relatedBlogSlug: null,
   },
   professional: {
@@ -195,7 +195,7 @@ export const VERTICALS_DATA: Record<string, VerticalContent> = {
         body: '“Vorrei parlare del rinnovo.” Ambrogio identifica cliente, recupera storico, fissa incontro con context.',
       },
     ],
-    metric: { value: '×2.4', label: 'Qualità lead vs reception standard' },
+    metric: { value: 'Filtro', label: 'Qualifica la richiesta prima del contatto' },
     relatedBlogSlug: null,
   },
 };

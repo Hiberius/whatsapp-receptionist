@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { requireSuperAdminOrRedirect } from '@/lib/auth/guards';
+
 const ADMIN_NAV = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/tenants', label: 'Tenants' },
@@ -10,7 +12,14 @@ const ADMIN_NAV = [
   { href: '/admin/system', label: 'Sistema' },
 ] as const;
 
-export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
+/**
+ * Gate del pannello cross-tenant. Le singole pagine admin chiamavano già
+ * `requireSuperAdmin`, ma il layout è la sede corretta del controllo: una
+ * pagina aggiunta domani è protetta per costruzione, non per disciplina.
+ */
+export default async function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
+  await requireSuperAdminOrRedirect();
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
       <header

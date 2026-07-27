@@ -1,9 +1,21 @@
 import { AppError } from '@/lib/errors/app-error';
 import { env } from '@/lib/env';
+import { fetchWithTimeout } from '@/lib/http/fetch-with-timeout';
+import { logger } from '@/lib/logging/logger';
+import {
+  whatsAppCredentialsResolver,
+  type WhatsAppCredentialsResolver,
+} from '@/server/whatsapp/client';
 
 export type DownloadWhatsAppMediaInput = {
   mediaId: string;
   expectedMimeType?: string | null;
+  /**
+   * Tenant proprietario del media. Il media di 360dialog è leggibile solo con
+   * la chiave del numero che lo ha ricevuto: senza tenant si ricade sulla
+   * chiave globale, che funziona solo per i tenant non ancora migrati.
+   */
+  tenantId?: string;
 };
 
 export type DownloadedWhatsAppMedia = {
@@ -27,18 +39,12 @@ export class Dialog360WhatsAppMediaClient implements WhatsAppMediaDownloader {
       apiKey?: string;
       maxBytes?: number;
       fetcher?: FetchLike;
+      credentials?: WhatsAppCredentialsResolver;
     } = {},
   ) {}
 
   async downloadMedia(input: DownloadWhatsAppMediaInput): Promise<DownloadedWhatsAppMedia> {
-    const apiKey = this.config.apiKey ?? env.WHATSAPP_API_KEY;
-
-    if (!apiKey) {
-      throw new AppError('internal', 'WhatsApp API key is not configured', {
-        expose: false,
-      });
-    }
-
+    const apiKey = await this.resolveApiKey(input.tenantId);
     const metadata = await this.fetchMediaMetadata(input.mediaId, apiKey);
     const mediaUrl = extractMediaUrl(metadata);
 
@@ -49,11 +55,18 @@ export class Dialog360WhatsAppMediaClient implements WhatsAppMediaDownloader {
       });
     }
 
-    const mediaResponse = await (this.config.fetcher ?? fetch)(mediaUrl, {
-      headers: {
-        'D360-API-KEY': apiKey,
+    const mediaResponse = await fetchWithTimeout(
+      mediaUrl,
+      {
+        headers: {
+          'D360-API-KEY': apiKey,
+        },
       },
-    });
+      {
+        label: 'WhatsApp media download',
+        ...(this.config.fetcher !== undefined ? { fetchImpl: this.config.fetcher } : {}),
+      },
+    );
 
     if (!mediaResponse.ok) {
       throw new AppError('upstream_error', 'WhatsApp media download failed', {
@@ -95,13 +108,42 @@ export class Dialog360WhatsAppMediaClient implements WhatsAppMediaDownloader {
     };
   }
 
+  private async resolveApiKey(tenantId: string | undefined): Promise<string> {
+    if (this.config.apiKey) {
+      return this.config.apiKey;
+    }
+
+    if (tenantId && this.config.credentials) {
+      return (await this.config.credentials.resolve(tenantId)).apiKey;
+    }
+
+    const globalApiKey = env.WHATSAPP_API_KEY.trim();
+
+    if (!globalApiKey) {
+      throw new AppError('internal', 'WhatsApp API key is not configured', {
+        expose: false,
+      });
+    }
+
+    logger.warn(
+      { tenantId: tenantId ?? null },
+      'Download media WhatsApp senza credenziali di tenant: fallback alla chiave globale',
+    );
+
+    return globalApiKey;
+  }
+
   private async fetchMediaMetadata(mediaId: string, apiKey: string): Promise<unknown> {
-    const response = await (this.config.fetcher ?? fetch)(
+    const response = await fetchWithTimeout(
       new URL(`/${encodeURIComponent(mediaId)}`, this.config.apiUrl ?? env.WHATSAPP_API_URL),
       {
         headers: {
           'D360-API-KEY': apiKey,
         },
+      },
+      {
+        label: 'WhatsApp media metadata',
+        ...(this.config.fetcher !== undefined ? { fetchImpl: this.config.fetcher } : {}),
       },
     );
 
@@ -121,8 +163,10 @@ export class Dialog360WhatsAppMediaClient implements WhatsAppMediaDownloader {
   }
 }
 
-export function createWhatsAppMediaDownloader(): WhatsAppMediaDownloader {
-  return new Dialog360WhatsAppMediaClient();
+export function createWhatsAppMediaDownloader(
+  credentials: WhatsAppCredentialsResolver = whatsAppCredentialsResolver(),
+): WhatsAppMediaDownloader {
+  return new Dialog360WhatsAppMediaClient({ credentials });
 }
 
 export function extensionForMimeType(contentType: string): string {

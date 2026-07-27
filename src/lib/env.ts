@@ -14,6 +14,13 @@ const envSchema = z.object({
   SUPABASE_MEDIA_BUCKET: z.string().default('ambrogio-media'),
   INTERNAL_JOB_SECRET: z.string().optional().default(''),
   INTERNAL_JOB_HEADER_NAME: z.string().default('x-ambrogio-job-secret'),
+  /**
+   * Segreto usato da Vercel Cron, che invoca i job in GET con
+   * `Authorization: Bearer <CRON_SECRET>` e non può inviare header custom.
+   * Se assente si ricade su INTERNAL_JOB_SECRET, così il self-hosting continua
+   * a funzionare con una sola variabile configurata.
+   */
+  CRON_SECRET: z.string().optional().default(''),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
   ANTHROPIC_MODEL_PRIMARY: z.string().optional().default(''),
   ANTHROPIC_MODEL_FAST: z.string().optional().default(''),
@@ -44,6 +51,13 @@ const envSchema = z.object({
   WHATSAPP_WEBHOOK_HEADER_SECRET: z.string().optional().default(''),
   WHATSAPP_WEBHOOK_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
   WHATSAPP_WEBHOOK_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
+  /**
+   * Senza RESEND_API_KEY il mailer ricade sul NoopEmailSender (logga, non spedisce):
+   * un ambiente di sviluppo non deve rompersi per una email non configurata.
+   */
+  RESEND_API_KEY: z.string().optional().default(''),
+  RESEND_FROM_EMAIL: z.string().default('Ambrogio.ai <hello@ambrogio.ai>'),
+  RESEND_API_URL: optionalUrl.default('https://api.resend.com/emails'),
   GOOGLE_OAUTH_CLIENT_ID: z.string().optional().default(''),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional().default(''),
   GOOGLE_OAUTH_AUTH_URL: optionalUrl.default('https://accounts.google.com/o/oauth2/v2/auth'),

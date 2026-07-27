@@ -4,14 +4,12 @@ import Link from 'next/link';
 import {
   buildBreadcrumbSchema,
   buildPersonSchema,
-  buildReviewSchema,
   buildWebPageSchema,
   JsonLd,
   organizationSchema,
 } from '@/components/marketing/JsonLd';
 import { SiteFooter } from '@/components/marketing/SiteFooter';
 import { SiteHeader } from '@/components/marketing/SiteHeader';
-import { BETA_REVIEWS } from '@/lib/schema/reviews-data';
 
 const SITE_URL = process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://ambrogio.ai';
 
@@ -91,18 +89,10 @@ export default function AboutPage() {
           speakableSelectors: ['h1', '.lead', '#story-heading + p'],
         })}
       />
-      {BETA_REVIEWS.map((review) => (
-        <JsonLd
-          key={`${review.authorName}-${review.datePublished}`}
-          data={buildReviewSchema({
-            authorName: review.authorName,
-            authorJobTitle: review.authorJobTitle,
-            reviewBody: review.reviewBody,
-            ratingValue: review.ratingValue,
-            datePublished: review.datePublished,
-          })}
-        />
-      ))}
+      {/*
+        Nessuno schema `Review` pubblicato: le recensioni vanno esposte come dati
+        strutturati solo quando sono reali, firmate dal cliente e verificabili.
+      */}
       <SiteHeader />
       <main id="main">
         <section className="section">
@@ -123,18 +113,19 @@ export default function AboutPage() {
             <section className="stack stack-6" aria-labelledby="story-heading">
               <h2 id="story-heading">La nostra storia</h2>
               <p>
-                Tutto è cominciato in una clinica dentistica di Milano. Otto chiamate fuori orario
-                al giorno, una segretaria al limite, pazienti che si sentivano dire &quot;richiami
-                domani&quot; e cercavano altrove. Abbiamo costruito il primo prototipo di Ambrogio
-                in 6 settimane, integrato WhatsApp Business e Google Calendar, e l&apos;abbiamo
-                messo in produzione su quel singolo studio.
+                Il punto di partenza è un problema che chiunque abbia gestito uno studio conosce: le
+                chiamate che arrivano quando non c&apos;è nessuno a rispondere. Fuori orario, in
+                pausa pranzo, mentre si è con un cliente. Chi chiama raramente richiama: cerca
+                altrove. Il centralino tradizionale non risolve, perché registra un messaggio invece
+                di prendere un appuntamento.
               </p>
               <p>
-                Risultato: 38% di booking notturni in più, €12.400 di fatturato recuperato nei primi
-                90 giorni, una segretaria che si è ricordata cosa vuol dire pranzare in pace. Da lì
-                abbiamo capito che il problema non era tecnico — era culturale. Le PMI italiane
-                meritano AI di qualità, in italiano, conforme GDPR, senza dover diventare data
-                scientist.
+                Ambrogio nasce per chiudere quel divario: un assistente che conversa su WhatsApp
+                nella lingua in cui scrivono i clienti, consulta la disponibilità reale
+                sull&apos;agenda e fissa l&apos;appuntamento. Abbiamo scelto di svilupparlo in open
+                source con licenza MIT perché le PMI italiane meritano AI di qualità, in italiano e
+                conforme al GDPR, senza dipendere da una scatola chiusa di cui non possono
+                verificare il funzionamento.
               </p>
               <p>
                 Oggi Ambrogio.ai è in beta privata con i primi 50 studi pilota selezionati. Vogliamo

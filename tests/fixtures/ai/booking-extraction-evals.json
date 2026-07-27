@@ -4,7 +4,11 @@
     "expected": {
       "serviceQuery": "igiene",
       "dateLabel": "domani",
+      "from": "2026-04-28T13:00:00.000Z",
+      "to": "2026-04-28T18:00:00.000Z",
       "dayPart": "afternoon",
+      "startHour": 13,
+      "endHour": 18,
       "customerName": null
     }
   },
@@ -13,8 +17,11 @@
     "expected": {
       "serviceQuery": null,
       "dateLabel": null,
+      "from": null,
+      "to": null,
       "dayPart": "exact_hour",
       "startHour": 15,
+      "endHour": 16,
       "customerName": null
     }
   },
@@ -23,7 +30,11 @@
     "expected": {
       "serviceQuery": null,
       "dateLabel": "domani",
+      "from": "2026-04-28T00:00:00.000Z",
+      "to": "2026-04-29T00:00:00.000Z",
       "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
       "customerName": null
     }
   },
@@ -32,7 +43,11 @@
     "expected": {
       "serviceQuery": "visita",
       "dateLabel": null,
+      "from": null,
+      "to": null,
       "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
       "customerName": "Mario"
     }
   },
@@ -41,10 +56,473 @@
     "expected": {
       "serviceQuery": "visita",
       "dateLabel": "venerdi",
+      "from": "2026-05-01T08:00:00.000Z",
+      "to": "2026-05-01T13:00:00.000Z",
       "dayPart": "morning",
       "startHour": 8,
       "endHour": 13,
       "customerName": "Mario"
+    }
+  },
+  {
+    "text": "Sono Mario Rossi, vorrei una visita. Il numero e 333 111 2233",
+    "expected": {
+      "serviceQuery": "visita",
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": "Mario Rossi"
+    }
+  },
+  {
+    "text": "Hai posto giovedi dopo le 18 per prima visita?",
+    "expected": {
+      "serviceQuery": "prima visita",
+      "dateLabel": "giovedi",
+      "from": "2026-04-30T18:00:00.000Z",
+      "to": "2026-04-30T21:00:00.000Z",
+      "dayPart": "after_hour",
+      "startHour": 18,
+      "endHour": 21,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Vorrei prenotare un controllo entro le 11",
+    "expected": {
+      "serviceQuery": "controllo",
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "before_hour",
+      "startHour": 8,
+      "endHour": 11,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Vorrei un controllo alle 3 del pomeriggio",
+    "expected": {
+      "serviceQuery": "controllo",
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "exact_hour",
+      "startHour": 15,
+      "endHour": 16,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Alle 8 di mattina",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "exact_hour",
+      "startHour": 8,
+      "endHour": 9,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Domani alle 11 di sera",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "domani",
+      "from": "2026-04-28T23:00:00.000Z",
+      "to": "2026-04-29T00:00:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 23,
+      "endHour": 24,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Sabato pomeriggio verso le 5",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "sabato",
+      "from": "2026-05-02T17:00:00.000Z",
+      "to": "2026-05-02T18:00:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 17,
+      "endHour": 18,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Dopodomani verso le 4",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "dopodomani",
+      "from": "2026-04-29T16:00:00.000Z",
+      "to": "2026-04-29T17:00:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 16,
+      "endHour": 17,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Posso passare a mezzogiorno?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "exact_hour",
+      "startHour": 12,
+      "endHour": 13,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Va bene le 15:30",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "exact_hour",
+      "startHour": 15.5,
+      "endHour": 16.5,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Lunedi alle 16.45",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "lunedi",
+      "from": "2026-05-04T16:45:00.000Z",
+      "to": "2026-05-04T17:45:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 16.75,
+      "endHour": 17.75,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Venerdi alle 10 e un quarto",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "venerdi",
+      "from": "2026-05-01T10:15:00.000Z",
+      "to": "2026-05-01T11:15:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 10.25,
+      "endHour": 11.25,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Domani alle 3 meno un quarto",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "domani",
+      "from": "2026-04-28T14:45:00.000Z",
+      "to": "2026-04-28T15:45:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 14.75,
+      "endHour": 15.75,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Buongiorno, avete posto il 15 maggio?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "15 maggio",
+      "from": "2026-05-15T00:00:00.000Z",
+      "to": "2026-05-16T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Prenotiamo per il 15/05",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "15 maggio",
+      "from": "2026-05-15T00:00:00.000Z",
+      "to": "2026-05-16T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Ci vediamo il 15/05/2027",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "15 maggio",
+      "from": "2027-05-15T00:00:00.000Z",
+      "to": "2027-05-16T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Il 3 marzo va bene?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "3 marzo",
+      "from": "2027-03-03T00:00:00.000Z",
+      "to": "2027-03-04T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Mi va bene il 2 giugno alle 10:45",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "2 giugno",
+      "from": "2026-06-02T10:45:00.000Z",
+      "to": "2026-06-02T11:45:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 10.75,
+      "endHour": 11.75,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Il 3 alle 9 e mezza",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "3 maggio",
+      "from": "2026-05-03T09:30:00.000Z",
+      "to": "2026-05-03T10:30:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 9.5,
+      "endHour": 10.5,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Tra tre giorni sarebbe perfetto",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "tra 3 giorni",
+      "from": "2026-04-30T00:00:00.000Z",
+      "to": "2026-05-01T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Fra una settimana per il controllo",
+    "expected": {
+      "serviceQuery": "controllo",
+      "dateLabel": "tra 1 settimana",
+      "from": "2026-05-04T00:00:00.000Z",
+      "to": "2026-05-05T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Settimana prossima",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "settimana prossima",
+      "from": "2026-05-04T00:00:00.000Z",
+      "to": "2026-05-11T00:00:00.000Z",
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Lunedi prossimo di mattina",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "lunedi",
+      "from": "2026-05-04T08:00:00.000Z",
+      "to": "2026-05-04T13:00:00.000Z",
+      "dayPart": "morning",
+      "startHour": 8,
+      "endHour": 13,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Dopo domani mattina",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "dopodomani",
+      "from": "2026-04-29T08:00:00.000Z",
+      "to": "2026-04-29T13:00:00.000Z",
+      "dayPart": "morning",
+      "startHour": 8,
+      "endHour": 13,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Domani pomerigio",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "domani",
+      "from": "2026-04-28T13:00:00.000Z",
+      "to": "2026-04-28T18:00:00.000Z",
+      "dayPart": "afternoon",
+      "startHour": 13,
+      "endHour": 18,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Venerdi matina alle 9",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": "venerdi",
+      "from": "2026-05-01T09:00:00.000Z",
+      "to": "2026-05-01T10:00:00.000Z",
+      "dayPart": "exact_hour",
+      "startHour": 9,
+      "endHour": 10,
+      "customerName": null
+    }
+  },
+
+  {
+    "text": "Appuntamento il 29 febbraio",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Il 31 febbraio alle 10",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "exact_hour",
+      "startHour": 10,
+      "endHour": 11,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Quanto costa una pulizia dei denti?",
+    "expected": {
+      "serviceQuery": "pulizia",
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Il trattamento costa 15/20 euro?",
+    "expected": {
+      "serviceQuery": "trattamento",
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Avete il numero 3331112233?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Ho 3 figli, fate sconti?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Buongiorno, siete aperti?",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Vorrei sapere i prezzi",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
+    }
+  },
+  {
+    "text": "Grazie mille!",
+    "expected": {
+      "serviceQuery": null,
+      "dateLabel": null,
+      "from": null,
+      "to": null,
+      "dayPart": "any",
+      "startHour": null,
+      "endHour": null,
+      "customerName": null
     }
   }
 ]
