@@ -24,6 +24,16 @@ See [`docs/PROJECT-STATUS.md`](docs/PROJECT-STATUS.md) for the full, verifiable 
 
 ---
 
+### Changed (unreleased)
+
+- **README rewritten** (English and Italian). Removed claims the code did not support: prompt caching (zero occurrences in `src/server/ai/`), Drizzle ORM as the migration layer (zero imports anywhere), "95+ Lighthouse" (never measured), and a mock WhatsApp webhook script the Quickstart promised but that does not exist. Stale counts corrected — 35 pages → 41, 37 routes → 41, 21 tables → 22.
+- **Real screenshots.** The README illustrated the product with hand-drawn SVG mockups showing invented data — a tenant named "Studio Rossi", 1.247 conversations, "+12% vs ieri" — including a trend the dashboard is not capable of computing. Replaced with PNGs captured from the running application via `scripts/capture-screenshots.mjs`. Authenticated screens are deliberately not shown: capturing them would need a tenant with real conversations.
+- **The RLS gate now checks every table.** `npm run db:lint` validated a hand-maintained list of 21 table names: a new table created without RLS, and not added to that list, passed the gate silently. It now derives the table list from the migrations themselves — verified by appending a table without RLS and confirming the check fails. All 22 tables are covered.
+- **`drizzle-orm` removed.** A production dependency with zero imports in the entire repository, listed in the tech stack as if it powered the migrations, which are hand-written SQL. Free supply-chain surface that also misrepresented the architecture.
+- Documented the branding divergence: the repository is the generic *WhatsApp Receptionist* while the application still ships Ambrogio.ai branding and an Italian-only interface.
+
+---
+
 ## [0.2.1] · Isolation, monitoring and retention · 2026-07-27
 
 Closes three of the gaps that 0.2.0 documented as open. Produced with **Claude Opus 5**.

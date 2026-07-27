@@ -8,38 +8,30 @@ const sql = readdirSync(migrationsDir)
   .map((file) => readFileSync(join(migrationsDir, file), 'utf8'))
   .join('\n');
 
-const requiredTables = [
-  'tenants',
-  'users',
-  'tenant_config',
-  'services',
-  'business_hours',
-  'conversations',
-  'messages',
-  'appointments',
-  'knowledge_base',
-  'integrations',
-  'opt_outs',
-  'usage_metrics',
-  'invoices',
-  'ai_prompts',
-  'voice_events',
-  'webhook_events',
-  'whatsapp_outbox_jobs',
-  'whatsapp_message_templates',
-  'whatsapp_voice_jobs',
-  'audit_log',
-  'billing_events',
-];
+/**
+ * Le tabelle da controllare vengono ricavate dalle migration stesse.
+ *
+ * Prima erano una lista scritta a mano: una tabella nuova creata senza RLS, e
+ * senza aggiungerla alla lista, passava il gate senza che nessuno se ne
+ * accorgesse. Un controllo che ignora ciò che non conosce protegge solo il
+ * passato.
+ */
+const declaredTables = [...sql.matchAll(/create table if not exists public\.(\w+)/g)]
+  .map((match) => match[1])
+  .filter((table, index, all) => all.indexOf(table) === index)
+  .sort();
 
-const missing = requiredTables.filter(
-  (table) =>
-    !sql.includes(`create table if not exists public.${table}`) ||
-    !sql.includes(`alter table public.${table} enable row level security`),
+if (declaredTables.length === 0) {
+  console.error('Nessuna tabella trovata nelle migration: il controllo non sta leggendo nulla.');
+  process.exit(1);
+}
+
+const missing = declaredTables.filter(
+  (table) => !sql.includes(`alter table public.${table} enable row level security`),
 );
 
 if (missing.length > 0) {
-  console.error(`Missing table/RLS coverage: ${missing.join(', ')}`);
+  console.error(`Tabelle senza Row Level Security: ${missing.join(', ')}`);
   process.exit(1);
 }
 
@@ -105,4 +97,6 @@ if (missingSnippets.length > 0) {
   process.exit(1);
 }
 
-console.log(`RLS migration coverage OK for ${requiredTables.length} tables.`);
+console.log(
+  `RLS migration coverage OK: ${declaredTables.length} tables declared, all with RLS enabled.`,
+);
