@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Opus%204.7%20Max-D97757?logo=anthropic)](https://anthropic.com)
-[![Tests](https://img.shields.io/badge/test-395%20passing-brightgreen)](#qualità)
+[![Tests](https://img.shields.io/badge/test-521%20passing-brightgreen)](#qualità)
 [![GDPR](https://img.shields.io/badge/GDPR-ready-2563eb)](#gdpr--sicurezza)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
 
@@ -34,25 +34,31 @@ In 3 frasi:
 
 ### Stato reale del progetto
 
-Preferiamo dichiarare il divario invece di lasciartelo scoprire dopo il clone. Gran parte del
-percorso di prodotto oggi funziona end-to-end; ciò che non funziona è indicato qui esplicitamente.
+Preferiamo dichiarare il divario invece di lasciartelo scoprire dopo il clone. Il quadro completo e
+verificabile — con i comandi per riprodurre ogni numero — è in
+**[docs/STATO-DEL-PROGETTO.md](docs/STATO-DEL-PROGETTO.md)**.
 
 | Livello | Stato |
 |---|---|
-| Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo anti-doppia-prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. Coperti da 395 test. |
-| Database (`supabase/migrations/`) | **Reale.** 22 tabelle, policy RLS, `timestamptz` ovunque, importi in centesimi interi, exclusion constraint contro la doppia prenotazione. |
-| Primitivi di sicurezza | **Reali.** Firma Stripe sul raw body, confronto timing-safe, state OAuth firmato HMAC e legato al tenant, AES-256-GCM sui token salvati, CSP con nonce. |
-| Dashboard tenant | **Collegata.** Dashboard, inbox conversazioni con risposta operatore, calendario, fatturazione, impostazioni WhatsApp e knowledge base leggono dati reali del tenant. |
-| Registrazione self-service | **Funzionante.** Registrazione → magic link → `/auth/callback` → onboarding → dashboard, con guard di autenticazione su ogni segmento autenticato. |
-| Provisioning WhatsApp | **Funzionante.** Il tenant collega il proprio numero dall'interfaccia; la API key è cifrata a riposo e un numero non può essere rivendicato da un secondo tenant. |
-| Job in background | **Funzionanti.** I cinque cron Vercel restituivano 405 a ogni esecuzione: l'outbox non veniva mai drenato. Corretto, con un test che lega `vercel.json` agli handler delle route. |
-| Pannello admin cross-tenant | **Non collegato.** Le viste tenant, utenti, fatturazione e audit dichiarano apertamente di non essere collegate e rimandano alla fonte autorevole. Cablarle richiede un servizio dedicato in `src/server/admin/` con test di isolamento, perché quelle letture scavalcano la RLS. |
+| Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo anti-doppia-prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. Coperti da 521 test. |
+| Database (`supabase/migrations/`) | **Reale.** 22 tabelle, policy RLS, `timestamptz` ovunque, importi in centesimi interi, exclusion constraint GiST contro la doppia prenotazione. |
+| Primitivi di sicurezza | **Reali.** Firma Stripe sul raw body, confronto timing-safe, state OAuth firmato HMAC e legato al tenant, AES-256-GCM sulle credenziali salvate, CSP con nonce. |
+| Registrazione self-service | **Funzionante.** Registrazione → magic link → `/auth/callback` → onboarding → dashboard, con guard su ogni segmento autenticato e validazione contro l'open redirect. |
+| Dashboard tenant | **Funzionante.** Dashboard, inbox conversazioni con risposta operatore, calendario, fatturazione, impostazioni WhatsApp, orari, servizi, personalità AI e knowledge base leggono dati reali. |
+| WhatsApp multi-tenant | **Funzionante.** Ogni tenant collega il proprio numero; la API key è cifrata a riposo, risolta per tenant al momento dell'invio, e un numero non può essere rivendicato da un secondo tenant. |
+| Escalation umana | **Funzionante.** I messaggi sensibili portano la conversazione in `escalated`, avvisano l'operatore via email con il contesto e dicono al cliente che una persona sta arrivando. |
+| Job in background | **Funzionanti.** I cinque cron Vercel restituivano 405 a ogni esecuzione: l'outbox non veniva mai drenato. Corretto, con un test di regressione che lega `vercel.json` agli handler. |
+| Isolamento tenant provato in CI | **Assente.** La RLS esiste su tutte e 22 le tabelle ma non viene mai valutata a runtime; l'isolamento poggia su filtri `tenant_id` scritti a mano. **È il punto aperto più importante.** |
+| Error tracking e alerting | **Assenti.** Niente Sentry, niente avvisi. Se il bot smette di rispondere alle 3 di notte, nessuno se ne accorge. |
+| Pannello admin cross-tenant | **Non collegato.** Quelle letture scavalcano la RLS e richiedono un servizio dedicato con test di isolamento. Le viste lo dichiarano invece di mostrare dati inventati. |
 
-38 pagine frontend, 38 API route, TypeScript strict con `exactOptionalPropertyTypes`, 395 test
-verdi, build di produzione verificata, **zero vulnerabilità nelle dipendenze di produzione**.
+41 pagine frontend, 39 route API, TypeScript strict con `exactOptionalPropertyTypes`, **521 test
+unitari e di integrazione + 56 test E2E Playwright**, build di produzione verificata, **zero
+vulnerabilità nelle dipendenze di produzione**.
 
-L'audit completo da cui è tratta questa tabella:
-[docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md).
+Realizzato con **Claude Opus 5 in modalità ultracode** — 31 agenti fra un audit verificato in modo
+avversariale e due workflow di implementazione paralleli. Metodo e finding completi:
+[docs/STATO-DEL-PROGETTO.md](docs/STATO-DEL-PROGETTO.md).
 
 ---
 
@@ -87,7 +93,7 @@ L'audit completo da cui è tratta questa tabella:
 | Billing | **Stripe Subscriptions + Customer Portal** | + **Fatture in Cloud** per fatturazione SDI italiana |
 | Rate limit | **Upstash Redis EU** | Edge-friendly, distribuito, policy nominate per endpoint |
 | Logging | **Pino** | JSON strutturato, redact PII automatico (email, telefono, IBAN, codice fiscale, …) |
-| Testing | **Vitest 4** | 395 test, unit + integration + smoke, coverage v8 |
+| Testing | **Vitest 4** + **Playwright** | 521 test unit/integrazione + 56 E2E, coverage v8 |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** + **lint-staged** | Pre-commit gitleaks, lint-staged, format on save |
 
 ---
@@ -147,7 +153,7 @@ Per vendere B2B in Italia serve la fatturazione elettronica via Sistema di Inter
 - **35 pagine frontend** — landing, pricing, 4 verticali (dental, beauty, fitness, professional), blog, help center, dashboard (5 sezioni), admin panel (6 sezioni), 5 pagine legali
 - **37 API route** — auth, billing, conversations, calendar, GDPR (Art. 15/17), webhook (Stripe + WhatsApp), health deep, internal job, contact
 - **7 migrazioni Supabase** — 21 tabelle, RLS completa, GDPR audit log, contact submissions
-- **395 test verdi** — unit + integration + smoke, Vitest 4 con coverage v8
+- **521 test verdi** — unit + integration + smoke, Vitest 4 con coverage v8
 - **Design system completo** — palette OKLCH editorial, Fraunces (display) + Inter (body), tipografia fluida con `clamp()`, design token in CSS custom properties
 - **JSON-LD schema** — Organization, SoftwareApplication, FAQ, Breadcrumb (iniettati programmaticamente)
 - **Middleware sicurezza** — CSP nonce per request, HSTS preload, COEP, COOP, CORP, X-Frame-Options DENY
@@ -202,7 +208,7 @@ npm run verify
 
 - **TypeScript strict** con `exactOptionalPropertyTypes` — pulito
 - **ESLint 9** flat config — < 60 warning, 0 errori
-- **395 test** verdi
+- **521 test** verdi
 - **21 tabelle** con RLS abilitata, validato programmaticamente
 
 Pipeline CI (GitHub Actions): `verify` → `coverage` → `production build` → `secret scan`.

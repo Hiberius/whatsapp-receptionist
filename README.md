@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Opus%204.7%20Max-D97757?logo=anthropic)](https://anthropic.com)
-[![Tests](https://img.shields.io/badge/tests-395%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-521%20passing-brightgreen)](#tests)
 [![GDPR](https://img.shields.io/badge/GDPR-ready-2563eb)](#gdpr--security)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
 
@@ -34,25 +34,31 @@ In 3 sentences:
 
 ### Honest state of play
 
-We publish the gap rather than let you discover it after cloning. Most of the product path now
-works end to end; what does not is named here explicitly.
+We publish the gap rather than let you discover it after cloning. The full, verifiable breakdown —
+including how to reproduce every number — is in
+**[docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md)**.
 
 | Layer | State |
 |---|---|
-| Domain services (`src/server/`) | **Real.** Booking with availability + anti-double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. Covered by 395 tests. |
-| Database (`supabase/migrations/`) | **Real.** 22 tables, RLS policies, `timestamptz` throughout, money as integer cents, exclusion constraint against double-booking. |
-| Security primitives | **Real.** Stripe signature over raw body, timing-safe secret comparison, HMAC-signed OAuth state bound to tenant, AES-256-GCM for stored tokens, nonce-based CSP. |
-| Tenant dashboard | **Wired.** Dashboard, conversations inbox with operator reply, calendar, billing, WhatsApp settings and knowledge base all read live tenant data. |
-| Self-service signup | **Working.** Register → magic link → `/auth/callback` → onboarding → dashboard, with auth guards on every authenticated segment. |
-| WhatsApp provisioning | **Working.** A tenant can attach its own number from the UI; the API key is encrypted at rest and a number cannot be claimed by a second tenant. |
-| Background jobs | **Working.** The five Vercel cron jobs previously returned 405 on every run — the outbox was never drained. Fixed, with a test tying `vercel.json` to the route handlers. |
-| Cross-tenant admin panel | **Not wired.** Tenants, users, billing and audit views state plainly that they are not connected and point at the authoritative source. Wiring them needs a dedicated `src/server/admin/` service with isolation tests, because those reads bypass RLS. |
+| Domain services (`src/server/`) | **Real.** Booking with availability + anti-double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. Covered by 521 tests. |
+| Database (`supabase/migrations/`) | **Real.** 22 tables, RLS policies, `timestamptz` throughout, money as integer cents, GiST exclusion constraint against double-booking. |
+| Security primitives | **Real.** Stripe signature over raw body, timing-safe secret comparison, HMAC-signed OAuth state bound to tenant, AES-256-GCM for stored credentials, nonce-based CSP. |
+| Self-service signup | **Working.** Register → magic link → `/auth/callback` → onboarding → dashboard, with auth guards on every authenticated segment and open-redirect validation. |
+| Tenant dashboard | **Working.** Dashboard, conversations inbox with operator reply, calendar, billing, WhatsApp settings, business hours, services, AI persona and knowledge base all read live tenant data. |
+| Multi-tenant WhatsApp | **Working.** Each tenant connects its own number; the API key is encrypted at rest, resolved per tenant at send time, and a number cannot be claimed by a second tenant. |
+| Human escalation | **Working.** Sensitive messages flip the conversation to `escalated`, email the operator with context, and tell the customer a human is coming. |
+| Background jobs | **Working.** The five Vercel cron jobs previously returned 405 on every run — the outbox was never drained. Fixed, with a regression test tying `vercel.json` to the route handlers. |
+| Tenant isolation proven in CI | **Missing.** RLS exists on all 22 tables but is never exercised at runtime; isolation rests on hand-written `tenant_id` filters. **The most important open item.** |
+| Error tracking / alerting | **Missing.** No Sentry, no alerting. If the bot stops replying at 3am, nobody finds out. |
+| Cross-tenant admin panel | **Not wired.** Those reads bypass RLS and need a dedicated service with isolation tests. The views say so instead of showing invented data. |
 
-38 frontend pages, 38 API routes, TypeScript strict with `exactOptionalPropertyTypes`, 395 tests
-passing, production build verified, **zero vulnerabilities in production dependencies**.
+41 frontend pages, 39 API routes, TypeScript strict with `exactOptionalPropertyTypes`, **521 unit
+and integration tests + 56 Playwright E2E tests**, production build verified, **zero vulnerabilities
+in production dependencies**.
 
-See [docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md) for the full
-self-audit this table is drawn from.
+Built with **Claude Opus 5 in ultracode mode** — 31 agents across an adversarially-verified audit
+and two parallel implementation workflows. Method and full findings:
+[docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md).
 
 ---
 
@@ -98,7 +104,7 @@ self-audit this table is drawn from.
 | Billing | **Stripe Subscriptions + Customer Portal** | + **Fatture in Cloud** for Italian SDI invoicing |
 | Rate limit | **Upstash Redis EU** | Edge-friendly, distributed, named policies per endpoint |
 | Logging | **Pino** | Structured JSON, automatic PII redact (email, phone, IBAN, fiscal_code, …) |
-| Testing | **Vitest 4** | 395 tests, unit + integration + smoke, v8 coverage |
+| Testing | **Vitest 4** + **Playwright** | 521 unit/integration tests + 56 E2E, v8 coverage |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** + **lint-staged** | Pre-commit gitleaks, lint-staged, format on save |
 
 ---
@@ -127,7 +133,7 @@ For production deployment, see [`docs/deployment.md`](docs/deployment.md).
 - **35 frontend pages** — landing, pricing, 4 verticals (dental, beauty, fitness, professional), blog, help center, dashboard (5 sections), admin panel (6 sections), 5 legal pages
 - **37 API routes** — auth, billing, conversations, calendar, GDPR (Art. 15/17), webhooks (Stripe + WhatsApp), health deep, internal jobs, contact
 - **7 Supabase migrations** — 21 tables, full RLS, GDPR audit log, contact submissions
-- **395 tests passing** — unit + integration + smoke, Vitest 4 with v8 coverage
+- **521 tests passing** — unit + integration + smoke, Vitest 4 with v8 coverage
 - **Full design system** — OKLCH editorial palette, Fraunces (display) + Inter (body), fluid clamp() typography, design tokens in CSS custom properties
 - **JSON-LD schemas** — Organization, SoftwareApplication, FAQ, Breadcrumb (programmatically injected)
 - **Security middleware** — CSP nonce-based per request, HSTS preload, COEP, COOP, CORP, X-Frame-Options DENY
@@ -181,7 +187,7 @@ src/
 └── middleware.ts             ← CSP nonce + COEP + COOP + CORP
 
 supabase/migrations/          ← 7 migrations, full RLS, GDPR audit log
-tests/                        ← unit + integration + smoke (395 tests)
+tests/                        ← unit + integration + smoke (521 tests)
 docs/                         ← architecture, API contract, deployment, schema
 ```
 
@@ -218,7 +224,7 @@ npm run verify
 
 - **TypeScript strict** with `exactOptionalPropertyTypes` — clean
 - **ESLint 9** flat config — < 60 warnings, 0 errors
-- **395 tests** passing
+- **521 tests** passing
 - **21 tables** with RLS abilitato, validated programmatically
 
 CI pipeline (GitHub Actions): `verify` → `coverage` → `production build` → `secret scan`.

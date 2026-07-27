@@ -24,20 +24,37 @@ The public open-source release.
 - Production-ready Dockerfile + docker-compose
 - Full English + Italian docs
 
-## 🔜 Next — v0.2 (target Q3 2026)
+## ✅ Released — v0.2.0 (July 2026)
 
-Focus: developer experience and reliability.
+Production hardening. Full verifiable breakdown in [PROJECT-STATUS.md](PROJECT-STATUS.md).
 
-- [ ] **Playwright E2E tests** for critical flows (signup → onboarding → first booking)
-- [ ] **Direct Meta HMAC SHA-256** webhook verification (alongside header-based path)
-- [ ] **Sentry integration** with sample DSN, source maps upload, release tracking
-- [ ] **Storybook** for the design system components
-- [ ] **OpenAPI / Swagger spec** auto-generated from Zod schemas
-- [ ] **Self-hosted Supabase** documented setup path
-- [ ] **Helm chart** for Kubernetes deployment
-- [ ] **More verticals**: legal practices, veterinary clinics, real estate, automotive
-- [ ] **WhatsApp template gallery** — pre-built templates for common scenarios
-- [ ] **i18n scaffolding** — runtime locale switching, ICU message format
+- Fixed: Vercel cron jobs returned 405 on every run — the WhatsApp outbox was never drained
+- Fixed: signup, login and the magic-link callback (nobody could create an account)
+- Fixed: the authenticated area had no auth guard
+- Added: per-tenant WhatsApp provisioning and per-tenant credential resolution
+- Added: human escalation with operator notification and customer acknowledgement
+- Added: transactional email, `fetchWithTimeout`, tenant-editable AI persona with immutable safety rules
+- Added: 56 Playwright E2E tests
+- Removed: every unverifiable public claim (fabricated ratings, case studies, uptime, admin metrics)
+- Security: 7 high-severity dependency vulnerabilities → 0 in production
+
+## 🔜 Next — v0.3 (target Q4 2026)
+
+Focus: proving what is currently only asserted.
+
+- [ ] **Tenant isolation proven in CI** — seed two tenants against real Supabase, assert A cannot read B. Highest priority: RLS exists on all 22 tables but is never exercised at runtime
+- [ ] **Test fakes that record `eq` arguments**, so removing a `tenant_id` filter turns a test red
+- [ ] **Sentry** with source maps and release tracking, plus an outbox watchdog
+- [ ] **Data retention job**, matching the 24-month retention the privacy policy states
+- [ ] **Resource/operator entity** — a practice with two chairs cannot be modelled today
+- [ ] **Team invitations** — one tenant currently means one user forever
+- [ ] **AI generation moved out of the webhook** into a dedicated outbox job
+- [ ] **Prompt caching** and a per-tenant AI cost ceiling
+- [ ] **Prompt injection defences** and a much larger AI evaluation set
+- [ ] **Cross-tenant admin panel** on top of a tested `src/server/admin/` service
+- [ ] **Executable self-hosting** — Compose currently has no scheduler and the bundled Valkey cannot serve the Upstash REST client
+- [ ] **OpenAPI spec** auto-generated from the Zod schemas
+- [ ] More verticals: legal practices, veterinary clinics, real estate, automotive
 
 ## 🔮 Future — v1.0 and beyond
 
