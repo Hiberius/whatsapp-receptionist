@@ -57,6 +57,9 @@ describe('WhatsAppVoicePipelineWorker', () => {
     expect(mediaDownloader.downloads[0]).toEqual({
       mediaId: 'media_audio_1',
       expectedMimeType: 'audio/ogg',
+      // Il tenant deve arrivare al downloader: senza, il media viene scaricato
+      // con la chiave WhatsApp globale invece che con quella del tenant.
+      tenantId: 'tenant_1',
     });
     expect(storage.uploads[0]).toMatchObject({
       tenantId: 'tenant_1',

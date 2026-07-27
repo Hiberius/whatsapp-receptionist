@@ -51,6 +51,13 @@ const envSchema = z.object({
   WHATSAPP_WEBHOOK_HEADER_SECRET: z.string().optional().default(''),
   WHATSAPP_WEBHOOK_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
   WHATSAPP_WEBHOOK_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
+  /**
+   * Senza RESEND_API_KEY il mailer ricade sul NoopEmailSender (logga, non spedisce):
+   * un ambiente di sviluppo non deve rompersi per una email non configurata.
+   */
+  RESEND_API_KEY: z.string().optional().default(''),
+  RESEND_FROM_EMAIL: z.string().default('Ambrogio.ai <hello@ambrogio.ai>'),
+  RESEND_API_URL: optionalUrl.default('https://api.resend.com/emails'),
   GOOGLE_OAUTH_CLIENT_ID: z.string().optional().default(''),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional().default(''),
   GOOGLE_OAUTH_AUTH_URL: optionalUrl.default('https://accounts.google.com/o/oauth2/v2/auth'),

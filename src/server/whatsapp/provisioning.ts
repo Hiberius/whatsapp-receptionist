@@ -3,6 +3,7 @@ import { AppError } from '@/lib/errors/app-error';
 import { logger } from '@/lib/logging/logger';
 import { encryptSecret, readCredentialSecret } from '@/server/integrations/credential-encryption';
 
+import { invalidateWhatsAppCredentials } from './client';
 import { WHATSAPP_PROVIDER } from './webhook-events';
 
 /**
@@ -58,8 +59,19 @@ export interface WhatsAppProvisioningRepository {
   revoke(input: { tenantId: string; integrationId: string }): Promise<void>;
 }
 
+/**
+ * Notifica che le credenziali di un tenant sono cambiate.
+ *
+ * Iniettabile perché i test non devono dipendere dalla cache di processo del
+ * client WhatsApp, e perché il servizio non deve conoscere chi la usa.
+ */
+export type CredentialsChangedListener = (tenantId: string) => void;
+
 export class WhatsAppProvisioningService {
-  constructor(private readonly repository: WhatsAppProvisioningRepository) {}
+  constructor(
+    private readonly repository: WhatsAppProvisioningRepository,
+    private readonly onCredentialsChanged: CredentialsChangedListener = () => {},
+  ) {}
 
   async connect(input: WhatsAppConnectionInput): Promise<WhatsAppConnectionStatus> {
     const phoneNumberId = input.phoneNumberId.trim();
@@ -102,6 +114,11 @@ export class WhatsAppProvisioningService {
       credentials: { api_key_encrypted: encryptSecret(apiKey) },
     });
 
+    // La cache credenziali ha un TTL di 5 minuti: senza invalidazione esplicita
+    // una chiave appena ruotata resterebbe inutilizzata fino alla scadenza, e
+    // i messaggi in uscita fallirebbero con la vecchia chiave nel frattempo.
+    this.onCredentialsChanged(input.tenantId);
+
     logger.info({ tenantId: input.tenantId }, 'Numero WhatsApp collegato');
 
     return toStatus(row);
@@ -120,6 +137,7 @@ export class WhatsAppProvisioningService {
     }
 
     await this.repository.revoke({ tenantId, integrationId: existing.id });
+    this.onCredentialsChanged(tenantId);
     logger.info({ tenantId }, 'Numero WhatsApp scollegato');
 
     return DISCONNECTED;
@@ -239,6 +257,7 @@ class SupabaseWhatsAppProvisioningRepository implements WhatsAppProvisioningRepo
 
 export function createWhatsAppProvisioningService(
   repository: WhatsAppProvisioningRepository = new SupabaseWhatsAppProvisioningRepository(),
+  onCredentialsChanged: CredentialsChangedListener = invalidateWhatsAppCredentials,
 ): WhatsAppProvisioningService {
-  return new WhatsAppProvisioningService(repository);
+  return new WhatsAppProvisioningService(repository, onCredentialsChanged);
 }

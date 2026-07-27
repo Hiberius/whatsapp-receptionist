@@ -69,6 +69,45 @@ jobs:
           INTERNAL_JOB_SECRET: placeholder
           WHATSAPP_WEBHOOK_HEADER_SECRET: placeholder
 
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: verify
+    # NON bloccante per ora. La suite è nuova e non è ancora stata osservata su
+    # esecuzioni reali in CI: non possiamo dichiararne la stabilità, e un job
+    # rosso per rumore insegna a ignorare i job rossi.
+    #
+    # Renderlo bloccante — cioè cancellare questa riga `continue-on-error` —
+    # quando sarà passato verde su almeno 10 PR consecutive senza consumare
+    # retry. Se un test si rivela instabile prima di allora, si corregge o si
+    # elimina quel test: non si allunga l'attesa.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Solo Chromium: la suite verifica redirect, forma delle richieste e
+      # feedback in interfaccia, non differenze di resa fra motori.
+      - run: npx playwright install --with-deps chromium
+      # Nessun segreto. `playwright.config.ts` avvia la build di produzione con
+      # gli stessi segnaposto del job `build`, tranne Upstash: lasciandolo vuoto
+      # il rate limiter ricade in memoria e non tenta chiamate di rete.
+      - run: npm run test:e2e
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
   security-scan:
     name: Secret scan (gitleaks)
     runs-on: ubuntu-latest

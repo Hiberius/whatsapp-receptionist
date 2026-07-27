@@ -50,6 +50,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
     "db:lint": "node scripts/check-rls-migration.mjs",
     "security:secrets": "gitleaks detect --source . --verbose",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run db:lint",
@@ -81,6 +84,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^25.0.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

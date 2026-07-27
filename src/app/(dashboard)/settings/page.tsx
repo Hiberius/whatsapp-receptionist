@@ -31,8 +31,8 @@ const SETTINGS_GROUPS: readonly SettingsGroup[] = [
     description: 'Nome, settore, lingua, fuso orario.',
     links: [
       { href: '/settings/profile', label: 'Profilo studio', available: false },
-      { href: '/settings/business-hours', label: 'Orari di apertura', available: false },
-      { href: '/settings/services', label: 'Servizi e listino', available: false },
+      { href: '/settings/business-hours', label: 'Orari di apertura', available: true },
+      { href: '/settings/services', label: 'Servizi e listino', available: true },
       { href: '/settings/team', label: 'Team e operatori', available: false },
     ],
   },

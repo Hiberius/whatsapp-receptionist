@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
 import { type AppError, toAppError } from '@/lib/errors/app-error';
-import { createWhatsAppMessageSender, type WhatsAppMessageSender } from '@/server/whatsapp/client';
+import {
+  createWhatsAppMessageSenderResolver,
+  type WhatsAppMessageSender,
+  type WhatsAppMessageSenderResolver,
+} from '@/server/whatsapp/client';
 import {
   SupabaseWhatsAppOutboxRepository,
   type ClaimedWhatsAppOutboxJob,
@@ -53,10 +57,17 @@ export type ProcessWhatsAppOutboxResult = {
   deadLetterJobs: number;
 };
 
+/**
+ * Il worker accetta sia un sender già istanziato sia un resolver per tenant.
+ * Un sender fisso resta legittimo solo per i test e per gli invii mono-tenant:
+ * in produzione la chiave dipende dal tenant del job.
+ */
+export type WhatsAppOutboxSender = WhatsAppMessageSender | WhatsAppMessageSenderResolver;
+
 export class WhatsAppOutboxWorker {
   constructor(
     private readonly repository: WhatsAppOutboxRepository,
-    private readonly messageSender: WhatsAppMessageSender,
+    private readonly messageSender: WhatsAppOutboxSender,
     private readonly options: {
       defaultLimit?: number;
       lockTtlSeconds?: number;
@@ -141,14 +152,16 @@ export class WhatsAppOutboxWorker {
         return 'dead_letter';
       }
 
+      const messageSender = await this.senderFor(job.tenantId);
+
       const sent =
         payload.data.type === 'text'
-          ? await this.messageSender.sendText({
+          ? await messageSender.sendText({
               to: job.recipientIdentifier,
               body: payload.data.text.body,
               previewUrl: payload.data.text.previewUrl,
             })
-          : await this.messageSender.sendTemplate({
+          : await messageSender.sendTemplate({
               to: job.recipientIdentifier,
               name: payload.data.template.name,
               languageCode: payload.data.template.languageCode,
@@ -199,6 +212,12 @@ export class WhatsAppOutboxWorker {
 
       return 'dead_letter';
     }
+  }
+
+  private async senderFor(tenantId: string): Promise<WhatsAppMessageSender> {
+    return 'resolveSender' in this.messageSender
+      ? this.messageSender.resolveSender(tenantId)
+      : this.messageSender;
   }
 }
 
@@ -255,7 +274,7 @@ export function isWhatsAppCustomerServiceWindowOpen(
 export function createWhatsAppOutboxWorker(): WhatsAppOutboxWorker {
   return new WhatsAppOutboxWorker(
     new SupabaseWhatsAppOutboxRepository(),
-    createWhatsAppMessageSender(),
+    createWhatsAppMessageSenderResolver(),
   );
 }
 

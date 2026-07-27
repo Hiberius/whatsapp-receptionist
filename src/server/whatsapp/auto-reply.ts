@@ -1,5 +1,11 @@
 import { env } from '@/lib/env';
+import { logger } from '@/lib/logging/logger';
 import type { BookingBridgeService } from '@/server/ai/booking-bridge';
+import {
+  createEscalationService,
+  type ConversationEscalator,
+  type EscalationReason,
+} from '@/server/conversations/escalation';
 import {
   createReplyOrchestrator,
   type ReplyOrchestrator,
@@ -82,12 +88,19 @@ type AutoReplyGuardrail = {
   reason: string;
 };
 
+/** Sottoinsieme di Pino usato qui, iniettabile nei test. */
+export interface AutoReplyLogger {
+  error(obj: Record<string, unknown>, msg: string): void;
+}
+
 export class WhatsAppAutoReplyService implements WhatsAppAutoReplyHandler {
   private readonly autoReplyEnabled: boolean;
   private readonly replyOrchestrator: ReplyOrchestrator;
   private readonly bookingBridge: BookingBridgeService | null;
   private readonly voiceTranscriptMinConfidence: number;
   private readonly usageLimits: UsageLimitsService | null;
+  private readonly escalation: ConversationEscalator | null;
+  private readonly log: AutoReplyLogger;
 
   constructor(
     private readonly repository: WhatsAppAutoReplyRepository,
@@ -97,6 +110,8 @@ export class WhatsAppAutoReplyService implements WhatsAppAutoReplyHandler {
       bookingBridge?: BookingBridgeService;
       voiceTranscriptMinConfidence?: number;
       usageLimits?: UsageLimitsService;
+      escalation?: ConversationEscalator;
+      log?: AutoReplyLogger;
     } = {},
   ) {
     this.autoReplyEnabled = options.autoReplyEnabled ?? env.AMBROGIO_AI_AUTOREPLY_ENABLED;
@@ -105,13 +120,62 @@ export class WhatsAppAutoReplyService implements WhatsAppAutoReplyHandler {
     this.voiceTranscriptMinConfidence =
       options.voiceTranscriptMinConfidence ?? env.AMBROGIO_VOICE_STT_MIN_CONFIDENCE;
     this.usageLimits = options.usageLimits ?? null;
+    this.escalation = options.escalation ?? createDefaultEscalation(repository);
+    this.log = options.log ?? logger;
   }
 
   async handleInboundMessage(input: WhatsAppAutoReplyInput): Promise<WhatsAppAutoReplyResult> {
-    const config = await this.repository.getTenantMessagingConfig(input.tenantId);
     const guardrail = evaluateAutoReplyGuardrail(input, {
       voiceTranscriptMinConfidence: this.voiceTranscriptMinConfidence,
     });
+    const result = await this.analyzeAndReply(input, guardrail);
+    await this.escalateIfNeeded(input, guardrail, result);
+
+    return result;
+  }
+
+  /**
+   * L'escalation non e' nel percorso critico del webhook: se fallisce, il
+   * messaggio resta analizzato e l'eventuale risposta gia' accodata. Rilanciare
+   * qui farebbe ritentare l'intero inbound per un errore di notifica.
+   */
+  private async escalateIfNeeded(
+    input: WhatsAppAutoReplyInput,
+    guardrail: AutoReplyGuardrail | null,
+    result: WhatsAppAutoReplyResult,
+  ): Promise<void> {
+    if (!this.escalation || result.classification.intent !== 'human_handoff') {
+      return;
+    }
+
+    try {
+      await this.escalation.escalate({
+        tenantId: input.tenantId,
+        conversationId: input.conversationId,
+        customerIdentifier: input.customerIdentifier,
+        inboundExternalId: input.inboundExternalId,
+        messageText: input.text,
+        occurredAt: input.occurredAt,
+        reason: toEscalationReason(guardrail),
+        aiReplied: result.queued,
+      });
+    } catch (error) {
+      this.log.error(
+        {
+          err: error,
+          tenantId: input.tenantId,
+          conversationId: input.conversationId,
+        },
+        'Escalation failed for inbound WhatsApp message',
+      );
+    }
+  }
+
+  private async analyzeAndReply(
+    input: WhatsAppAutoReplyInput,
+    guardrail: AutoReplyGuardrail | null,
+  ): Promise<WhatsAppAutoReplyResult> {
+    const config = await this.repository.getTenantMessagingConfig(input.tenantId);
     const baseReplyPlan = guardrail
       ? {
           shouldReply: false,
@@ -366,6 +430,29 @@ function evaluateAutoReplyGuardrail(
   }
 
   return null;
+}
+
+/**
+ * Attiva l'escalation senza dover toccare le factory dei worker: il repository
+ * WhatsApp e' gia' il notificatore WhatsApp del cliente. Senza credenziali
+ * Supabase (test, build) resta null, come per l'AI context provider.
+ */
+function createDefaultEscalation(
+  repository: WhatsAppAutoReplyRepository,
+): ConversationEscalator | null {
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    return null;
+  }
+
+  return createEscalationService({ customerNotifier: repository });
+}
+
+/**
+ * Senza guardrail l'intent `human_handoff` arriva dal classificatore: e' il
+ * cliente che ha chiesto esplicitamente una persona.
+ */
+function toEscalationReason(guardrail: AutoReplyGuardrail | null): EscalationReason {
+  return guardrail ? guardrail.code : 'human_handoff_intent';
 }
 
 function guardrailToClassification(guardrail: AutoReplyGuardrail): IntentClassification {
