@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { LoginForm } from '@/components/auth/LoginForm';
+
 export const metadata: Metadata = {
   title: 'Accedi · Ambrogio.ai',
   description: 'Accedi al tuo account Ambrogio.ai',
@@ -18,30 +20,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form action="/api/auth/magic-link" method="POST" className="stack stack-4">
-        <div role="status" aria-live="polite" id="login-form-errors" className="sr-only" />
-
-        <div className="field">
-          <label htmlFor="email" className="label">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            required
-            placeholder="tu@studio.it"
-            className="input"
-          />
-          <p className="helper">Ti invieremo un link sicuro che scade dopo 10 minuti.</p>
-        </div>
-
-        <button type="submit" className="btn btn-primary btn-lg">
-          Invia link di accesso
-        </button>
-      </form>
+      <LoginForm />
 
       <div
         className="stack stack-3"

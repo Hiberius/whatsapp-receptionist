@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { RegisterForm } from '@/components/auth/RegisterForm';
+
 export const metadata: Metadata = {
   title: 'Registrati · Ambrogio.ai',
   description: 'Crea il tuo account Ambrogio.ai e attiva la reception AI in 24 ore.',
@@ -26,61 +28,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <form action="/api/auth/sign-up" method="POST" className="stack stack-4">
-        <div role="status" aria-live="polite" id="register-form-errors" className="sr-only" />
-
-        <div className="field">
-          <label htmlFor="business_name" className="label">
-            Nome studio o azienda
-          </label>
-          <input
-            id="business_name"
-            name="business_name"
-            type="text"
-            autoComplete="organization"
-            required
-            placeholder="Studio Dentistico Rossi"
-            className="input"
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="email" className="label">
-            Email di lavoro
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            required
-            placeholder="info@studio.it"
-            className="input"
-          />
-          <p className="helper">Useremo questa email per l&apos;account principale del tenant.</p>
-        </div>
-
-        <div className="field">
-          <label htmlFor="vertical" className="label">
-            Settore
-          </label>
-          <select id="vertical" name="vertical" required className="select" defaultValue="">
-            <option value="" disabled>
-              Seleziona il settore
-            </option>
-            <option value="dental">Studio dentistico</option>
-            <option value="beauty">Centro estetico / SPA</option>
-            <option value="fitness">Palestra / personal trainer</option>
-            <option value="professional">Studio professionale</option>
-            <option value="other">Altro</option>
-          </select>
-        </div>
-
-        <button type="submit" className="btn btn-primary btn-lg">
-          Crea account
-        </button>
-      </form>
+      <RegisterForm />
 
       <ul
         className="card stack stack-2"
