@@ -10,7 +10,7 @@ The public open-source release.
 - 37 API routes with Zod validation
 - 21 Supabase tables with full RLS
 - Anthropic Claude orchestration with intent classification
-- Meta WhatsApp Cloud API integration (text + voice)
+- 360dialog Business API integration, an official Meta BSP (text + voice)
 - ElevenLabs Speech-to-Text + Text-to-Speech
 - Google Calendar OAuth booking
 - Stripe Subscriptions + Customer Portal

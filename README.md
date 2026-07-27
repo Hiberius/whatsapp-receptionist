@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Opus%204.7%20Max-D97757?logo=anthropic)](https://anthropic.com)
-[![Tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-395%20passing-brightgreen)](#tests)
 [![GDPR](https://img.shields.io/badge/GDPR-ready-2563eb)](#gdpr--security)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
 
@@ -34,21 +34,22 @@ In 3 sentences:
 
 ### Honest state of play
 
-This is a **v0.1 backend engine with a marketing site on top**, not a turnkey product. We publish the
-gap rather than let you discover it after cloning.
+We publish the gap rather than let you discover it after cloning. Most of the product path now
+works end to end; what does not is named here explicitly.
 
 | Layer | State |
 |---|---|
-| Domain services (`src/server/`) | **Real.** Booking with availability + anti-double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. Covered by 369 tests. |
+| Domain services (`src/server/`) | **Real.** Booking with availability + anti-double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. Covered by 395 tests. |
 | Database (`supabase/migrations/`) | **Real.** 22 tables, RLS policies, `timestamptz` throughout, money as integer cents, exclusion constraint against double-booking. |
 | Security primitives | **Real.** Stripe signature over raw body, timing-safe secret comparison, HMAC-signed OAuth state bound to tenant, AES-256-GCM for stored tokens, nonce-based CSP. |
-| Tenant dashboard + admin panel | **Not wired.** The pages render static placeholder data and do not call the API. Being connected in the current milestone. |
-| Self-service signup | **Not working.** Form encoding and the magic-link callback are being fixed in the current milestone. |
-| WhatsApp provisioning | **Missing.** No path yet to attach a tenant's own number; being added in the current milestone. |
+| Tenant dashboard | **Wired.** Dashboard, conversations inbox with operator reply, calendar, billing, WhatsApp settings and knowledge base all read live tenant data. |
+| Self-service signup | **Working.** Register → magic link → `/auth/callback` → onboarding → dashboard, with auth guards on every authenticated segment. |
+| WhatsApp provisioning | **Working.** A tenant can attach its own number from the UI; the API key is encrypted at rest and a number cannot be claimed by a second tenant. |
+| Background jobs | **Working.** The five Vercel cron jobs previously returned 405 on every run — the outbox was never drained. Fixed, with a test tying `vercel.json` to the route handlers. |
+| Cross-tenant admin panel | **Not wired.** Tenants, users, billing and audit views state plainly that they are not connected and point at the authoritative source. Wiring them needs a dedicated `src/server/admin/` service with isolation tests, because those reads bypass RLS. |
 
-35 frontend pages, 37 API routes, TypeScript strict with `exactOptionalPropertyTypes`, 369 tests
-passing, production build verified. What that buys you today is a **serious, readable foundation to
-build on** — not something you can sell on Monday.
+38 frontend pages, 38 API routes, TypeScript strict with `exactOptionalPropertyTypes`, 395 tests
+passing, production build verified, **zero vulnerabilities in production dependencies**.
 
 See [docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md) for the full
 self-audit this table is drawn from.
@@ -59,7 +60,7 @@ self-audit this table is drawn from.
 
 |     |     |
 | --- | --- |
-| **WhatsApp + voice** | Text messages and voice notes via Meta WhatsApp Cloud API + ElevenLabs STT/TTS. No Baileys, no unofficial BSPs. |
+| **WhatsApp + voice** | Text messages and voice notes via the 360dialog Business API (an official Meta BSP) + ElevenLabs STT/TTS. No Baileys, no scraped clients. |
 | **Real bookings** | Google Calendar OAuth, conflict detection, automatic confirmations, reminders, reschedule flows. |
 | **Anthropic Claude** | Intent extraction, conversation orchestration, prompt caching, fallbacks, escalation rules. |
 | **GDPR-native** | Art. 15 export + Art. 17 delete endpoints, audit logging, EU hosting (Supabase Frankfurt + Upstash EU). |
@@ -92,12 +93,12 @@ self-audit this table is drawn from.
 | Auth | **Supabase Auth** | httpOnly + secure + sameSite=lax cookies, SSR-aware session |
 | AI orchestration | **Anthropic Claude Opus 4.7 Max** | Best-in-class tool use, prompt caching, predictable latency |
 | Voice | **ElevenLabs STT + TTS** | Italian voice quality matters — ElevenLabs nails it |
-| Messaging | **Meta WhatsApp Cloud API** | Official only. No Baileys, no scraped clients. |
+| Messaging | **360dialog Business API** | Official Meta BSP (`waba-v2.360dialog.io`). No Baileys, no scraped clients. |
 | Calendar | **Google Calendar OAuth** | Encrypted token storage, conflict detection, multi-calendar |
 | Billing | **Stripe Subscriptions + Customer Portal** | + **Fatture in Cloud** for Italian SDI invoicing |
 | Rate limit | **Upstash Redis EU** | Edge-friendly, distributed, named policies per endpoint |
 | Logging | **Pino** | Structured JSON, automatic PII redact (email, phone, IBAN, fiscal_code, …) |
-| Testing | **Vitest 4** | 369 tests, unit + integration + smoke, v8 coverage |
+| Testing | **Vitest 4** | 395 tests, unit + integration + smoke, v8 coverage |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** + **lint-staged** | Pre-commit gitleaks, lint-staged, format on save |
 
 ---
@@ -126,7 +127,7 @@ For production deployment, see [`docs/deployment.md`](docs/deployment.md).
 - **35 frontend pages** — landing, pricing, 4 verticals (dental, beauty, fitness, professional), blog, help center, dashboard (5 sections), admin panel (6 sections), 5 legal pages
 - **37 API routes** — auth, billing, conversations, calendar, GDPR (Art. 15/17), webhooks (Stripe + WhatsApp), health deep, internal jobs, contact
 - **7 Supabase migrations** — 21 tables, full RLS, GDPR audit log, contact submissions
-- **369 tests passing** — unit + integration + smoke, Vitest 4 with v8 coverage
+- **395 tests passing** — unit + integration + smoke, Vitest 4 with v8 coverage
 - **Full design system** — OKLCH editorial palette, Fraunces (display) + Inter (body), fluid clamp() typography, design tokens in CSS custom properties
 - **JSON-LD schemas** — Organization, SoftwareApplication, FAQ, Breadcrumb (programmatically injected)
 - **Security middleware** — CSP nonce-based per request, HSTS preload, COEP, COOP, CORP, X-Frame-Options DENY
@@ -180,7 +181,7 @@ src/
 └── middleware.ts             ← CSP nonce + COEP + COOP + CORP
 
 supabase/migrations/          ← 7 migrations, full RLS, GDPR audit log
-tests/                        ← unit + integration + smoke (369 tests)
+tests/                        ← unit + integration + smoke (395 tests)
 docs/                         ← architecture, API contract, deployment, schema
 ```
 
@@ -217,7 +218,7 @@ npm run verify
 
 - **TypeScript strict** with `exactOptionalPropertyTypes` — clean
 - **ESLint 9** flat config — < 60 warnings, 0 errors
-- **369 tests** passing
+- **395 tests** passing
 - **21 tables** with RLS abilitato, validated programmatically
 
 CI pipeline (GitHub Actions): `verify` → `coverage` → `production build` → `secret scan`.

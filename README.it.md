@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Powered by Anthropic Claude](https://img.shields.io/badge/Claude-Opus%204.7%20Max-D97757?logo=anthropic)](https://anthropic.com)
-[![Tests](https://img.shields.io/badge/test-369%20passing-brightgreen)](#qualità)
+[![Tests](https://img.shields.io/badge/test-395%20passing-brightgreen)](#qualità)
 [![GDPR](https://img.shields.io/badge/GDPR-ready-2563eb)](#gdpr--sicurezza)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
 
@@ -34,21 +34,22 @@ In 3 frasi:
 
 ### Stato reale del progetto
 
-Questo è un **motore backend v0.1 con sopra un sito di presentazione**, non un prodotto chiavi in
-mano. Preferiamo dichiarare il divario invece di lasciartelo scoprire dopo il clone.
+Preferiamo dichiarare il divario invece di lasciartelo scoprire dopo il clone. Gran parte del
+percorso di prodotto oggi funziona end-to-end; ciò che non funziona è indicato qui esplicitamente.
 
 | Livello | Stato |
 |---|---|
-| Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo anti-doppia-prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. Coperti da 369 test. |
+| Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo anti-doppia-prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. Coperti da 395 test. |
 | Database (`supabase/migrations/`) | **Reale.** 22 tabelle, policy RLS, `timestamptz` ovunque, importi in centesimi interi, exclusion constraint contro la doppia prenotazione. |
 | Primitivi di sicurezza | **Reali.** Firma Stripe sul raw body, confronto timing-safe, state OAuth firmato HMAC e legato al tenant, AES-256-GCM sui token salvati, CSP con nonce. |
-| Dashboard tenant e pannello admin | **Non collegati.** Le pagine mostrano dati segnaposto statici e non chiamano le API. In collegamento nella milestone corrente. |
-| Registrazione self-service | **Non funzionante.** Encoding dei form e callback del magic link in correzione nella milestone corrente. |
-| Provisioning WhatsApp | **Assente.** Non esiste ancora un percorso per collegare il numero del tenant; in aggiunta nella milestone corrente. |
+| Dashboard tenant | **Collegata.** Dashboard, inbox conversazioni con risposta operatore, calendario, fatturazione, impostazioni WhatsApp e knowledge base leggono dati reali del tenant. |
+| Registrazione self-service | **Funzionante.** Registrazione → magic link → `/auth/callback` → onboarding → dashboard, con guard di autenticazione su ogni segmento autenticato. |
+| Provisioning WhatsApp | **Funzionante.** Il tenant collega il proprio numero dall'interfaccia; la API key è cifrata a riposo e un numero non può essere rivendicato da un secondo tenant. |
+| Job in background | **Funzionanti.** I cinque cron Vercel restituivano 405 a ogni esecuzione: l'outbox non veniva mai drenato. Corretto, con un test che lega `vercel.json` agli handler delle route. |
+| Pannello admin cross-tenant | **Non collegato.** Le viste tenant, utenti, fatturazione e audit dichiarano apertamente di non essere collegate e rimandano alla fonte autorevole. Cablarle richiede un servizio dedicato in `src/server/admin/` con test di isolamento, perché quelle letture scavalcano la RLS. |
 
-35 pagine frontend, 37 API route, TypeScript strict con `exactOptionalPropertyTypes`, 369 test
-verdi, build di produzione verificata. Quello che ottieni oggi è una **base seria e leggibile su cui
-costruire** — non qualcosa da vendere lunedì.
+38 pagine frontend, 38 API route, TypeScript strict con `exactOptionalPropertyTypes`, 395 test
+verdi, build di produzione verificata, **zero vulnerabilità nelle dipendenze di produzione**.
 
 L'audit completo da cui è tratta questa tabella:
 [docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md).
@@ -59,7 +60,7 @@ L'audit completo da cui è tratta questa tabella:
 
 |     |     |
 | --- | --- |
-| **WhatsApp + voce** | Messaggi e note vocali via Meta WhatsApp Cloud API ufficiale + ElevenLabs STT/TTS. Niente Baileys o BSP non ufficiali. |
+| **WhatsApp + voce** | Messaggi e note vocali via 360dialog Business API (BSP ufficiale Meta) + ElevenLabs STT/TTS. Niente Baileys o client scraped. |
 | **Appuntamenti veri** | Google Calendar OAuth, conflict detection, conferme automatiche, reminder, riprogrammazione. |
 | **Anthropic Claude** | Estrazione intent, orchestrazione conversazione, prompt caching, fallback, regole di escalation. |
 | **GDPR nativo** | Endpoint Art. 15 (export) + Art. 17 (delete), audit log, hosting EU (Supabase Frankfurt + Upstash EU). |
@@ -81,12 +82,12 @@ L'audit completo da cui è tratta questa tabella:
 | Auth | **Supabase Auth** | Cookie httpOnly + secure + sameSite=lax, sessione SSR-aware |
 | AI | **Anthropic Claude Opus 4.7 Max** | Tool use migliore in classe, prompt caching, latenza prevedibile |
 | Voce | **ElevenLabs STT + TTS** | La qualità della voce italiana conta — ElevenLabs la fa bene |
-| Messaggistica | **Meta WhatsApp Cloud API** | Solo ufficiale. Niente Baileys, niente client scraped. |
+| Messaggistica | **360dialog Business API** | BSP ufficiale Meta (`waba-v2.360dialog.io`). Niente Baileys, niente client scraped. |
 | Calendario | **Google Calendar OAuth** | Token cifrati, conflict detection, multi-calendar |
 | Billing | **Stripe Subscriptions + Customer Portal** | + **Fatture in Cloud** per fatturazione SDI italiana |
 | Rate limit | **Upstash Redis EU** | Edge-friendly, distribuito, policy nominate per endpoint |
 | Logging | **Pino** | JSON strutturato, redact PII automatico (email, telefono, IBAN, codice fiscale, …) |
-| Testing | **Vitest 4** | 369 test, unit + integration + smoke, coverage v8 |
+| Testing | **Vitest 4** | 395 test, unit + integration + smoke, coverage v8 |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** + **lint-staged** | Pre-commit gitleaks, lint-staged, format on save |
 
 ---
@@ -146,7 +147,7 @@ Per vendere B2B in Italia serve la fatturazione elettronica via Sistema di Inter
 - **35 pagine frontend** — landing, pricing, 4 verticali (dental, beauty, fitness, professional), blog, help center, dashboard (5 sezioni), admin panel (6 sezioni), 5 pagine legali
 - **37 API route** — auth, billing, conversations, calendar, GDPR (Art. 15/17), webhook (Stripe + WhatsApp), health deep, internal job, contact
 - **7 migrazioni Supabase** — 21 tabelle, RLS completa, GDPR audit log, contact submissions
-- **369 test verdi** — unit + integration + smoke, Vitest 4 con coverage v8
+- **395 test verdi** — unit + integration + smoke, Vitest 4 con coverage v8
 - **Design system completo** — palette OKLCH editorial, Fraunces (display) + Inter (body), tipografia fluida con `clamp()`, design token in CSS custom properties
 - **JSON-LD schema** — Organization, SoftwareApplication, FAQ, Breadcrumb (iniettati programmaticamente)
 - **Middleware sicurezza** — CSP nonce per request, HSTS preload, COEP, COOP, CORP, X-Frame-Options DENY
@@ -201,7 +202,7 @@ npm run verify
 
 - **TypeScript strict** con `exactOptionalPropertyTypes` — pulito
 - **ESLint 9** flat config — < 60 warning, 0 errori
-- **369 test** verdi
+- **395 test** verdi
 - **21 tabelle** con RLS abilitata, validato programmaticamente
 
 Pipeline CI (GitHub Actions): `verify` → `coverage` → `production build` → `secret scan`.
