@@ -76,7 +76,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # Bloccante: un gate che non può fallire non è un gate. Se produce falsi
+      # positivi si aggiunge una regola a .gitleaks.toml, non si ignora l'esito.
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
+
+  dependency-audit:
+    name: Dependency audit (production)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Solo le dipendenze di produzione: sono quelle che finiscono in
+      # runtime. Il grafo di sviluppo contiene vulnerabilità in strumenti
+      # (ESLint) i cui input sono i nostri stessi file di configurazione, non
+      # input di un attaccante — vedi docs/SECURITY-AUDIT-NOTES.md.
+      - run: npm audit --omit=dev --audit-level=high
