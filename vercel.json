@@ -21,6 +21,14 @@
     {
       "path": "/api/internal/jobs/gdpr-hard-delete",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/internal/jobs/health-watchdog",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/internal/jobs/data-retention",
+      "schedule": "30 3 * * *"
     }
   ]
 }

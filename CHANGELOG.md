@@ -24,6 +24,32 @@ See [`docs/PROJECT-STATUS.md`](docs/PROJECT-STATUS.md) for the full, verifiable 
 
 ---
 
+## [0.2.1] · Isolation, monitoring and retention · 2026-07-27
+
+Closes three of the gaps that 0.2.0 documented as open. Produced with **Claude Opus 5**.
+
+### Added
+
+- **Tenant isolation regression tests.** The in-memory Supabase fakes now record every `.eq()` argument, and dedicated suites assert that each tenant-scoped read carries its own `tenant_id` filter. Verified the only way that counts: by deleting a filter from production code and confirming a test turns red. **Before this change, removing a tenant filter left all 521 tests green** — the isolation that the whole multi-tenant model rests on was covered by nothing.
+- **Health watchdog** (`/api/internal/jobs/health-watchdog`, every 15 minutes). Raises an email alert when the outbound queue stops draining: jobs ready but untouched past a threshold, a growing backlog, or messages that exhausted their retries. This is the exact failure that already happened here and went unnoticed — it is silent by construction, because every endpoint returns 200 while nothing is delivered. Deliberately a separate job from the outbox worker: if it were the same job, a stalled worker would also block the alert about the stalled worker.
+- **Data retention job** (`/api/internal/jobs/data-retention`, daily). Enforces exactly the thresholds the public privacy policy states — 24 months for conversations, 90 days for voice data, 12 months for technical logs — with a dry-run mode, because the first pass over real data is irreversible. A test reads the privacy policy page and fails if code and public promise ever diverge.
+
+### Fixed
+
+- Voice media downloads now pass `tenantId`, so a tenant's audio is fetched with its own provider credentials rather than the global key.
+- `WhatsAppProvisioningService` invalidates the per-tenant credential cache on connect and disconnect: a freshly rotated key would otherwise stay unused for up to five minutes while outbound messages failed with the old one.
+
+### Changed
+
+- Test suite: 521 → **544**.
+- Five superseded Dependabot pull requests closed; GitHub security alerts on the default branch are at zero.
+
+### Still open
+
+Tenant isolation is now covered at the application level but **still not proven against the database**: RLS policies exist on all 22 tables and are never exercised at runtime. That remains the top item. Sentry is still absent, so individual unhandled exceptions are logged but not aggregated — wiring an SDK needs a real DSN to verify against, so it was not added blind.
+
+---
+
 ## [0.2.0] · Production hardening · 2026-07-27
 
 The release that turns a well-built backend into a product a customer can actually use.

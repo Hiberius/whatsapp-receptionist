@@ -28,6 +28,14 @@ interface FluentBuilder {
 
 const state: {
   fromCalls: string[];
+  /**
+   * Ogni `.eq()` intercettato, con colonna e valore.
+   *
+   * Senza questa registrazione il fake accettava qualunque catena di query e
+   * rimuovere un filtro `tenant_id` dal codice di produzione lasciava i test
+   * verdi: l'isolamento fra tenant non era coperto da nulla.
+   */
+  eqCalls: Array<{ table: string; column: unknown; value: unknown }>;
   insertOps: Array<{ table: string; payload: unknown }>;
   updateOps: Array<{ table: string; payload: unknown }>;
   // queue per terminator-await senza .single() (es. listConversations termina con .limit())
@@ -38,6 +46,7 @@ const state: {
   updateThenable: FromResult | null;
 } = {
   fromCalls: [],
+  eqCalls: [],
   insertOps: [],
   updateOps: [],
   thenableQueue: [],
@@ -62,7 +71,10 @@ function makeBuilder(table: string): FluentBuilder {
         insert: () => tail,
         update: () => tail,
         upsert: () => tail,
-        eq: () => tail,
+        eq: (column: unknown, value: unknown) => {
+          state.eqCalls.push({ table, column, value });
+          return tail;
+        },
         order: () => tail,
         limit: () => tail,
         lt: () => tail,
@@ -84,7 +96,10 @@ function makeBuilder(table: string): FluentBuilder {
       state.insertOps.push({ table: `${table}:upsert`, payload });
       return builder;
     },
-    eq: () => builder,
+    eq: (column: unknown, value: unknown) => {
+      state.eqCalls.push({ table, column, value });
+      return builder;
+    },
     order: () => builder,
     limit: () => listTerminator(),
     lt: () => builder,
@@ -102,7 +117,10 @@ function makeBuilder(table: string): FluentBuilder {
       insert: () => tail,
       update: () => tail,
       upsert: () => tail,
-      eq: () => tail,
+      eq: (column: unknown, value: unknown) => {
+        state.eqCalls.push({ table, column, value });
+        return tail;
+      },
       order: () => tail,
       limit: () => tail,
       lt: () => tail,
@@ -132,6 +150,7 @@ const { SupabaseConversationInboxRepository } = await import('@/server/conversat
 
 beforeEach(() => {
   state.fromCalls = [];
+  state.eqCalls = [];
   state.insertOps = [];
   state.updateOps = [];
   state.thenableQueue = [];
@@ -314,5 +333,85 @@ describe('SupabaseConversationInboxRepository.recordAuditLog', () => {
         metadata: {},
       }),
     ).rejects.toMatchObject({ code: 'upstream_error' });
+  });
+});
+
+/**
+ * Isolamento fra tenant al livello del repository.
+ *
+ * Questi test non verificano un comportamento visibile all'utente: verificano
+ * che ogni lettura porti con sé il proprio filtro `tenant_id`. Sono necessari
+ * perché tutti i moduli server usano il client `service_role`, che scavalca la
+ * Row Level Security: a runtime l'unico presidio contro una fuga di dati fra
+ * tenant sono questi filtri scritti a mano.
+ *
+ * Prima che il fake registrasse gli argomenti di `eq`, cancellare un
+ * `.eq('tenant_id', ...)` dal codice di produzione lasciava verdi tutti i 521
+ * test della suite.
+ */
+describe('SupabaseConversationInboxRepository — isolamento tenant', () => {
+  function tenantFilters(): Array<{ table: string; column: unknown; value: unknown }> {
+    return state.eqCalls.filter((call) => call.column === 'tenant_id');
+  }
+
+  it('filtra per tenant quando elenca le conversazioni', async () => {
+    state.thenableQueue.push({ data: [], error: null });
+    const repo = new SupabaseConversationInboxRepository();
+
+    await repo.listConversations({
+      tenantId: 'tenant_1',
+      filters: { limit: 30, before: null },
+    });
+
+    expect(tenantFilters()).toContainEqual({
+      table: 'conversations',
+      column: 'tenant_id',
+      value: 'tenant_1',
+    });
+  });
+
+  it('filtra per tenant quando legge una singola conversazione', async () => {
+    state.maybeSingleQueue.push({ data: null, error: null });
+    const repo = new SupabaseConversationInboxRepository();
+
+    await repo.getConversation({ tenantId: 'tenant_1', conversationId: 'conv_1' });
+
+    expect(tenantFilters()).toContainEqual({
+      table: 'conversations',
+      column: 'tenant_id',
+      value: 'tenant_1',
+    });
+  });
+
+  it('filtra per tenant quando elenca i messaggi di una conversazione', async () => {
+    state.thenableQueue.push({ data: [], error: null });
+    const repo = new SupabaseConversationInboxRepository();
+
+    await repo.listMessages({
+      tenantId: 'tenant_1',
+      conversationId: 'conv_1',
+      limit: 50,
+    });
+
+    // Filtrare solo per conversationId non basta: un id di conversazione
+    // indovinato o trapelato darebbe accesso ai messaggi di un altro tenant.
+    expect(tenantFilters()).toContainEqual({
+      table: 'messages',
+      column: 'tenant_id',
+      value: 'tenant_1',
+    });
+  });
+
+  it('non usa mai il tenant di un altro nei filtri emessi', async () => {
+    state.thenableQueue.push({ data: [], error: null });
+    const repo = new SupabaseConversationInboxRepository();
+
+    await repo.listConversations({
+      tenantId: 'tenant_1',
+      filters: { limit: 30, before: null },
+    });
+
+    const foreign = tenantFilters().filter((call) => call.value !== 'tenant_1');
+    expect(foreign).toEqual([]);
   });
 });

@@ -28,11 +28,20 @@ interface FluentBuilder {
 
 const fluentState: {
   fromCalls: string[];
+  /**
+   * Ogni `.eq()` intercettato, con colonna e valore.
+   *
+   * Senza questa registrazione il fake accettava qualunque catena di query e
+   * rimuovere un filtro `tenant_id` dal codice di produzione lasciava i test
+   * verdi: l'isolamento fra tenant non era coperto da nulla.
+   */
+  eqCalls: Array<{ table: string; column: unknown; value: unknown }>;
   singleResult: FromResult;
   maybeSingleResult: FromResult;
   updateError: { message: string } | null;
 } = {
   fromCalls: [],
+  eqCalls: [],
   singleResult: { data: null, error: null },
   maybeSingleResult: { data: null, error: null },
   updateError: null,
@@ -40,7 +49,7 @@ const fluentState: {
 
 const rpcMock = vi.fn();
 
-function makeBuilder(): FluentBuilder {
+function makeBuilder(table: string): FluentBuilder {
   const builder: FluentBuilder = {
     select: () => builder,
     insert: () => builder,
@@ -49,7 +58,10 @@ function makeBuilder(): FluentBuilder {
       // Ritorniamo un thenable che risolve a { error } per il pattern
       //   const { error } = await this.supabase.from(...).update(...).eq(...);
       const tail = {
-        eq: () => tail,
+        eq: (column: unknown, value: unknown) => {
+          fluentState.eqCalls.push({ table, column, value });
+          return tail;
+        },
         then: (resolve: (value: { error: { message: string } | null }) => void) =>
           resolve({ error: fluentState.updateError }),
       };
@@ -57,7 +69,10 @@ function makeBuilder(): FluentBuilder {
       return tail as unknown as FluentBuilder;
     },
     upsert: () => builder,
-    eq: () => builder,
+    eq: (column: unknown, value: unknown) => {
+      fluentState.eqCalls.push({ table, column, value });
+      return builder;
+    },
     single: async () => fluentState.singleResult,
     maybeSingle: async () => fluentState.maybeSingleResult,
   };
@@ -68,7 +83,7 @@ function makeBuilder(): FluentBuilder {
 const adminClientMock = {
   from: vi.fn((table: string) => {
     fluentState.fromCalls.push(table);
-    return makeBuilder();
+    return makeBuilder(table);
   }),
   rpc: rpcMock,
 };
@@ -83,6 +98,7 @@ const { SupabaseWhatsAppVoiceRepository, currentSttModel } =
 beforeEach(() => {
   rpcMock.mockReset();
   fluentState.fromCalls = [];
+  fluentState.eqCalls = [];
   fluentState.singleResult = { data: null, error: null };
   fluentState.maybeSingleResult = { data: null, error: null };
   fluentState.updateError = null;

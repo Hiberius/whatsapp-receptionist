@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-receptionist",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "type": "module",
   "description": "Open-source AI receptionist for WhatsApp. Books real appointments, transcribes voice messages, integrates with Google Calendar and Stripe. Multi-tenant SaaS starter kit. Crafted in Italy with GDPR built-in.",

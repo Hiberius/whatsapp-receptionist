@@ -44,10 +44,10 @@ Subscriptions · Upstash Redis · Playwright · Vitest · licenza MIT.
 | Metrica | Valore |
 |---|---|
 | Pagine frontend | 41 |
-| Route API | 39 |
+| Route API | 41 |
 | Moduli di dominio server-side | 16 |
 | Tabelle a database (tutte con RLS) | 22 |
-| Test unitari e di integrazione | **521** su 80 file |
+| Test unitari e di integrazione | **544** su 82 file |
 | Test end-to-end (Playwright) | **56** su 5 spec |
 | Righe di TypeScript in `src/` | ~39.700 |
 | Vulnerabilità nelle dipendenze di produzione | **0** |
@@ -144,26 +144,41 @@ rimando alla fonte autorevole, al posto dei dati inventati che mostravano prima.
 la Row Level Security. Meritano un servizio dedicato in `src/server/admin/` con test di isolamento,
 non query improvvisate dentro una pagina.
 
-### L'isolamento tra tenant è applicativo, non dimostrato dal database
+### L'isolamento tra tenant non è ancora dimostrato contro il database
 
-24 moduli server usano il client service-role, quindi l'isolamento poggia su circa 66 filtri
-`.eq('tenant_id')` scritti a mano. Le policy RLS esistono su tutte e 22 le tabelle ma non vengono
-mai valutate a runtime, e nessun job di CI semina due tenant e dimostra che il tenant A non può
-leggere il tenant B.
+**Parzialmente chiuso.** I filtri a livello di repository sono ora coperti da test di regressione: i
+fake in memoria registrano ogni argomento di `.eq()`, e suite dedicate verificano che ogni lettura
+tenant-scoped porti con sé il proprio filtro `tenant_id`. È stato verificato nell'unico modo che
+conta — cancellando un filtro dal codice di produzione e controllando che un test diventi rosso.
+Prima di questa modifica, rimuovere un filtro tenant lasciava verdi tutti i 521 test.
 
-**È il punto aperto più importante in assoluto.** Va considerato il prerequisito per gestire dati di
-clienti reali su scala.
+**Ancora aperto:** 24 moduli server usano il client service-role, che scavalca la RLS. Le policy
+esistono su tutte e 22 le tabelle ma non vengono mai valutate a runtime, e nessun job di CI semina
+due tenant su un Postgres vero e dimostra che A non può leggere B. La rete applicativa ora esiste;
+la prova a livello di database no.
 
-### Nessun error tracking, nessun alerting
+**Resta il punto aperto più importante in assoluto.** Va considerato il prerequisito per gestire
+dati di clienti reali su scala.
 
-Non c'è Sentry, non c'è OpenTelemetry, non ci sono avvisi. Se il bot smette di rispondere alle 3 di
-notte, nessuno se ne accorge finché un cliente non si lamenta. `/api/health/deep` esegue probe reali
-ed è utilizzabile come endpoint di monitoraggio esterno, ma nulla lo consuma.
+### L'error tracking è parziale
 
-### Nessun job di retention
+**Parzialmente chiuso.** Un watchdog gira ogni 15 minuti e manda un allarme via email quando la coda
+di uscita smette di essere drenata: job pronti e non presi in carico oltre una soglia, coda in
+accumulo, o messaggi che hanno esaurito i tentativi. È esattamente il guasto già accaduto qui e
+passato inosservato, ed è silenzioso per costruzione: ogni endpoint risponde 200 mentre non viene
+consegnato nulla.
 
-La privacy policy pubblica dichiara una retention di 24 mesi. I dati delle conversazioni crescono
-oggi senza limite: il job di cancellazione non esiste.
+**Ancora aperto:** non c'è Sentry né OpenTelemetry, quindi una singola eccezione non gestita viene
+registrata nei log ma non aggregata, non genera un avviso e non è collegata a una release.
+Collegare un SDK richiede un DSN reale su cui verificarlo, motivo per cui non è stato aggiunto alla
+cieca.
+
+### Retention — chiuso
+
+Un job giornaliero applica esattamente le soglie dichiarate nella privacy policy pubblica: 24 mesi
+per le conversazioni, 90 giorni per i dati vocali, 12 mesi per i log tecnici. Supporta una modalità
+di simulazione, perché il primo passaggio su dati reali è irreversibile. Un test legge la pagina
+della privacy policy e fallisce se il codice e la promessa pubblica divergono.
 
 ### Il modello dati esclude due casi comuni
 
@@ -189,19 +204,17 @@ sempre: non esiste un flusso di invito per il team.
 
 In ordine di rapporto impatto/sforzo.
 
-1. **Isolamento tra tenant dimostrato in CI.** Avviare Supabase, applicare le migration da zero,
-   seminare due tenant e asserire che A non legge B. Inoltre far registrare ai fake dei test gli
-   argomenti di `eq`, così che rimuovere un filtro tenant faccia diventare rosso un test — oggi non
-   accade.
-2. **Error tracking e watchdog.** Sentry con source map e release tracking, più un job che si
-   accorga quando l'outbox smette di drenare.
-3. **Job di data retention**, allineato alla retention che la privacy policy già promette.
-4. **Entità risorsa e team.** Vincoli di prenotazione per risorsa e flusso di invito del team.
-5. **Spostare la generazione AI fuori dal webhook** in un job outbox dedicato: elimina in un colpo
+1. **Isolamento tra tenant dimostrato contro un database vero.** Avviare Supabase in CI, applicare
+   le migration da zero, seminare due tenant e asserire che A non legge B attraverso le policy RLS
+   stesse. I test di regressione applicativi ora esistono; la prova a livello di database no.
+2. **Sentry** con source map e release tracking, per aggregare le eccezioni che il watchdog non
+   copre.
+3. **Entità risorsa e team.** Vincoli di prenotazione per risorsa e flusso di invito del team.
+4. **Spostare la generazione AI fuori dal webhook** in un job outbox dedicato: elimina in un colpo
    solo la latenza sincrona e il rischio di retry.
-6. **Prompt caching e tetto di costo AI per tenant.**
-7. **Cablare il pannello admin cross-tenant** sopra un servizio `src/server/admin/` testato.
-8. **Difese contro il prompt injection** e un insieme di valutazione molto più ampio per il livello
+5. **Prompt caching e tetto di costo AI per tenant.**
+6. **Cablare il pannello admin cross-tenant** sopra un servizio `src/server/admin/` testato.
+7. **Difese contro il prompt injection** e un insieme di valutazione molto più ampio per il livello
    AI.
 
 Gli obiettivi di lungo periodo sono in [`ROADMAP.md`](ROADMAP.md).
@@ -248,7 +261,7 @@ Non fidarti di questa pagina. Ogni numero qui sopra è riproducibile:
 git clone https://github.com/Hiberius/whatsapp-receptionist.git
 cd whatsapp-receptionist
 npm ci
-npm run verify          # typecheck + lint + 521 test + controllo copertura RLS
+npm run verify          # typecheck + lint + 544 test + controllo copertura RLS
 npm audit --omit=dev    # 0 vulnerabilità
 npm run build           # build di produzione
 npx playwright install chromium && npm run test:e2e   # 56 test E2E

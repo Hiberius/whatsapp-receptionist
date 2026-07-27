@@ -55,6 +55,11 @@ const envSchema = z.object({
    * Senza RESEND_API_KEY il mailer ricade sul NoopEmailSender (logga, non spedisce):
    * un ambiente di sviluppo non deve rompersi per una email non configurata.
    */
+  /**
+   * Destinatario degli allarmi operativi del watchdog (coda ferma, dead-letter).
+   * Senza, il watchdog osserva e registra nei log ma non avvisa nessuno.
+   */
+  OPS_ALERT_EMAIL: z.string().optional().default(''),
   RESEND_API_KEY: z.string().optional().default(''),
   RESEND_FROM_EMAIL: z.string().default('Ambrogio.ai <hello@ambrogio.ai>'),
   RESEND_API_URL: optionalUrl.default('https://api.resend.com/emails'),

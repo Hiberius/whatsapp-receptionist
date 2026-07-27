@@ -43,10 +43,10 @@ Subscriptions · Upstash Redis · Playwright · Vitest · MIT license.
 | Metric | Value |
 |---|---|
 | Frontend pages | 41 |
-| API routes | 39 |
+| API routes | 41 |
 | Server-side domain modules | 16 |
 | Database tables (all with RLS) | 22 |
-| Unit + integration tests | **521** across 80 files |
+| Unit + integration tests | **544** across 82 files |
 | End-to-end tests (Playwright) | **56** across 5 specs |
 | Lines of TypeScript in `src/` | ~39,700 |
 | Vulnerabilities in production dependencies | **0** |
@@ -139,25 +139,40 @@ the authoritative source, instead of the fabricated data they previously display
 Security. They deserve a dedicated `src/server/admin/` service with isolation tests, not queries
 improvised inside a page.
 
-### Tenant isolation is enforced in application code, not proven by the database
+### Tenant isolation is not yet proven against the database
 
-24 server modules use the service-role client, so isolation rests on roughly 66 hand-written
-`.eq('tenant_id')` filters. RLS policies exist on all 22 tables but are never exercised at runtime,
-and no CI job seeds two tenants and proves that tenant A cannot read tenant B.
+**Partly closed.** The repository-level filters are now covered by regression tests: the in-memory
+fakes record every `.eq()` argument, and dedicated suites assert that each tenant-scoped read
+carries its own `tenant_id` filter. This was verified the only way that counts — by deleting a
+filter from production code and confirming a test turns red. Before this change, removing a tenant
+filter left all 521 tests green.
 
-**This is the single most important open item.** Treat it as the prerequisite for handling real
+**Still open:** 24 server modules use the service-role client, which bypasses RLS. The policies
+exist on all 22 tables but are never exercised at runtime, and no CI job seeds two tenants against
+a real Postgres and proves that A cannot read B. The application-level net is now real; the
+database-level proof is not.
+
+**Still the single most important open item.** Treat it as the prerequisite for handling real
 customer data at scale.
 
-### No error tracking or alerting
+### Error tracking is partial
 
-There is no Sentry, no OpenTelemetry, no alerting. If the bot stops replying at 3am, nobody finds
-out until a customer complains. `/api/health/deep` runs real probes and is usable as an external
-monitoring endpoint, but nothing consumes it.
+**Partly closed.** A health watchdog runs every 15 minutes and raises an email alert when the
+outbound queue stops draining — jobs ready but untouched past a threshold, a growing backlog, or
+messages that exhausted their retries. That is the exact failure that already happened here and
+went unnoticed, and it is silent by construction: every endpoint returns 200 while nothing is
+delivered.
 
-### No data retention job
+**Still open:** there is no Sentry or OpenTelemetry, so an individual unhandled exception is
+logged but not aggregated, alerted on, or tied to a release. Wiring an SDK needs a real DSN to
+verify against, which is why it was not added blind.
 
-The public privacy policy states 24-month retention. Conversation data currently grows without
-bound; the deletion job does not exist.
+### Data retention — closed
+
+A daily job now enforces exactly the thresholds the public privacy policy states: 24 months for
+conversations, 90 days for voice data, 12 months for technical logs. It supports a dry run, since
+the first pass over real data is irreversible. A test reads the privacy policy page and fails if
+the code and the public promise ever diverge.
 
 ### The data model excludes two common cases
 
@@ -183,18 +198,17 @@ there is no team invitation flow.
 
 Ordered by impact over effort.
 
-1. **Tenant isolation proven in CI.** Spin up Supabase, apply migrations from scratch, seed two
-   tenants, assert that A cannot read B. Also make the in-memory test fakes record their `eq`
-   arguments, so deleting a tenant filter turns a test red — today it does not.
-2. **Error tracking and a health watchdog.** Sentry with source maps and release tracking, plus a
-   job that notices when the outbox stops draining.
-3. **Data retention job**, matching the retention the privacy policy already promises.
-4. **Resource and team entities.** Per-resource booking constraints and a team invitation flow.
-5. **Move AI generation out of the webhook** into a dedicated outbox job, removing the synchronous
+1. **Tenant isolation proven against a real database.** Spin up Supabase in CI, apply migrations
+   from scratch, seed two tenants, assert that A cannot read B through the RLS policies themselves.
+   The application-level regression tests exist now; the database-level proof does not.
+2. **Sentry** with source maps and release tracking, to aggregate the exceptions the watchdog does
+   not cover.
+3. **Resource and team entities.** Per-resource booking constraints and a team invitation flow.
+4. **Move AI generation out of the webhook** into a dedicated outbox job, removing the synchronous
    latency and the retry risk in one change.
-6. **Prompt caching and a per-tenant AI cost ceiling.**
-7. **Wire the cross-tenant admin panel** on top of a tested `src/server/admin/` service.
-8. **Prompt injection defences** and a much larger evaluation set for the AI layer.
+5. **Prompt caching and a per-tenant AI cost ceiling.**
+6. **Wire the cross-tenant admin panel** on top of a tested `src/server/admin/` service.
+7. **Prompt injection defences** and a much larger evaluation set for the AI layer.
 
 Longer-term items live in [`ROADMAP.md`](ROADMAP.md).
 
@@ -237,7 +251,7 @@ Do not take this page on trust. Every number above is reproducible:
 git clone https://github.com/Hiberius/whatsapp-receptionist.git
 cd whatsapp-receptionist
 npm ci
-npm run verify          # typecheck + lint + 521 tests + RLS coverage check
+npm run verify          # typecheck + lint + 544 tests + RLS coverage check
 npm audit --omit=dev    # 0 vulnerabilities
 npm run build           # production build
 npx playwright install chromium && npm run test:e2e   # 56 E2E tests

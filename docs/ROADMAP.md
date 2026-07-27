@@ -38,14 +38,19 @@ Production hardening. Full verifiable breakdown in [PROJECT-STATUS.md](PROJECT-S
 - Removed: every unverifiable public claim (fabricated ratings, case studies, uptime, admin metrics)
 - Security: 7 high-severity dependency vulnerabilities → 0 in production
 
+## ✅ Released — v0.2.1 (July 2026)
+
+- Tenant isolation regression tests: fakes record every `.eq()`, verified by deleting a filter and watching a test fail
+- Health watchdog: emails an alert when the outbound queue stops draining
+- Data retention job enforcing the thresholds the privacy policy states
+- Per-tenant credentials applied to voice media downloads; credential cache invalidated on connect/disconnect
+
 ## 🔜 Next — v0.3 (target Q4 2026)
 
 Focus: proving what is currently only asserted.
 
-- [ ] **Tenant isolation proven in CI** — seed two tenants against real Supabase, assert A cannot read B. Highest priority: RLS exists on all 22 tables but is never exercised at runtime
-- [ ] **Test fakes that record `eq` arguments**, so removing a `tenant_id` filter turns a test red
-- [ ] **Sentry** with source maps and release tracking, plus an outbox watchdog
-- [ ] **Data retention job**, matching the 24-month retention the privacy policy states
+- [ ] **Tenant isolation proven against the database** — seed two tenants against real Supabase in CI and assert A cannot read B through the RLS policies themselves. The application-level regression tests landed in 0.2.1; the database-level proof has not
+- [ ] **Sentry** with source maps and release tracking, to aggregate the exceptions the watchdog does not cover
 - [ ] **Resource/operator entity** — a practice with two chairs cannot be modelled today
 - [ ] **Team invitations** — one tenant currently means one user forever
 - [ ] **AI generation moved out of the webhook** into a dedicated outbox job

@@ -24,6 +24,14 @@ interface FluentBuilder {
 
 const state: {
   fromCalls: string[];
+  /**
+   * Ogni `.eq()` intercettato, con colonna e valore.
+   *
+   * Senza questa registrazione il fake accettava qualunque catena di query e
+   * rimuovere un filtro `tenant_id` dal codice di produzione lasciava i test
+   * verdi: l'isolamento fra tenant non era coperto da nulla.
+   */
+  eqCalls: Array<{ table: string; column: unknown; value: unknown }>;
   insertOps: Array<{ table: string; payload: unknown }>;
   updateOps: Array<{ table: string; payload: unknown }>;
   // Coda di risultati per .single() in ordine FIFO
@@ -34,6 +42,7 @@ const state: {
   updateError: unknown;
 } = {
   fromCalls: [],
+  eqCalls: [],
   insertOps: [],
   updateOps: [],
   singleQueue: [],
@@ -70,7 +79,10 @@ function makeBuilder(table: string): FluentBuilder {
         insert: () => tail,
         update: () => tail,
         upsert: () => tail,
-        eq: () => tail,
+        eq: (column: unknown, value: unknown) => {
+          state.eqCalls.push({ table, column, value });
+          return tail;
+        },
         contains: () => tail,
         single: async () => popOrDefault(state.singleQueue),
         maybeSingle: async () => popOrDefault(state.maybeSingleQueue),
@@ -84,7 +96,10 @@ function makeBuilder(table: string): FluentBuilder {
       state.insertOps.push({ table: `${table}:upsert`, payload });
       return builder;
     },
-    eq: () => builder,
+    eq: (column: unknown, value: unknown) => {
+      state.eqCalls.push({ table, column, value });
+      return builder;
+    },
     contains: () => builder,
     single: async () => popOrDefault(state.singleQueue),
     maybeSingle: async () => popOrDefault(state.maybeSingleQueue),
@@ -114,6 +129,7 @@ const { SupabaseWhatsAppWebhookRepository } = await import('@/server/whatsapp/re
 
 beforeEach(() => {
   state.fromCalls = [];
+  state.eqCalls = [];
   state.insertOps = [];
   state.updateOps = [];
   state.singleQueue = [];
@@ -369,5 +385,61 @@ describe('SupabaseWhatsAppWebhookRepository.incrementUsage', () => {
         messagesDelta: 1,
       }),
     ).rejects.toMatchObject({ code: 'upstream_error' });
+  });
+});
+
+/**
+ * Isolamento fra tenant sul percorso WhatsApp.
+ *
+ * È il percorso più esposto del prodotto: i dati arrivano da un webhook
+ * pubblico e vengono scritti e riletti in `service_role`, che scavalca la Row
+ * Level Security. L'unico presidio a runtime contro una fuga di dati fra
+ * tenant sono i filtri `tenant_id` scritti a mano in questa repository.
+ */
+describe('SupabaseWhatsAppWebhookRepository — isolamento tenant', () => {
+  function tenantFilters(): Array<{ table: string; column: unknown; value: unknown }> {
+    return state.eqCalls.filter((call) => call.column === 'tenant_id');
+  }
+
+  it('filtra per tenant quando legge la configurazione di messaggistica', async () => {
+    state.maybeSingleQueue.push({ data: null, error: null });
+    const repo = new SupabaseWhatsAppWebhookRepository();
+
+    await repo.getTenantMessagingConfig('tenant_1');
+
+    expect(tenantFilters()).toContainEqual({
+      table: 'tenant_config',
+      column: 'tenant_id',
+      value: 'tenant_1',
+    });
+  });
+
+  it('filtra per tenant quando verifica lo stato di opt-out di un cliente', async () => {
+    state.maybeSingleQueue.push({ data: null, error: null });
+    const repo = new SupabaseWhatsAppWebhookRepository();
+
+    await repo.isCustomerOptedOut({
+      tenantId: 'tenant_1',
+      channel: 'whatsapp',
+      customerIdentifier: '393331112233',
+    });
+
+    // Senza il filtro tenant, lo stesso numero di telefono presente presso due
+    // clienti diversi condividerebbe l'opt-out: la revoca del consenso di uno
+    // silenzierebbe le comunicazioni dell'altro.
+    expect(tenantFilters()).toContainEqual({
+      table: 'opt_outs',
+      column: 'tenant_id',
+      value: 'tenant_1',
+    });
+  });
+
+  it('non emette filtri riferiti a un tenant diverso da quello richiesto', async () => {
+    state.maybeSingleQueue.push({ data: null, error: null });
+    const repo = new SupabaseWhatsAppWebhookRepository();
+
+    await repo.getTenantMessagingConfig('tenant_1');
+
+    expect(tenantFilters().filter((call) => call.value !== 'tenant_1')).toEqual([]);
   });
 });
