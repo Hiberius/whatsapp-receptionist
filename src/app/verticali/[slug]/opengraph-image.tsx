@@ -8,14 +8,14 @@ export const contentType = 'image/png';
 const VERTICAL_META: Record<string, { label: string; metric: string; color: string }> = {
   dental: {
     label: 'Studi dentistici',
-    metric: '+34% booking notturni',
+    metric: 'Risponde 24/7',
     color: 'oklch(45% 0.12 175)',
   },
-  beauty: { label: 'Centri estetici', metric: '-68% no-show', color: 'oklch(55% 0.1 80)' },
-  fitness: { label: 'Palestre e PT', metric: '+22% attendance', color: 'oklch(45% 0.13 145)' },
+  beauty: { label: 'Centri estetici', metric: 'Promemoria automatici', color: 'oklch(55% 0.1 80)' },
+  fitness: { label: 'Palestre e PT', metric: 'Disponibilità live', color: 'oklch(45% 0.13 145)' },
   professional: {
     label: 'Studi professionali',
-    metric: '×2.4 qualità lead',
+    metric: 'Lead pre-qualificati',
     color: 'oklch(40% 0.1 260)',
   },
 };

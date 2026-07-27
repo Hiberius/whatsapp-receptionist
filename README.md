@@ -32,7 +32,26 @@ In 3 sentences:
 - **Understands intent, books real appointments** on Google Calendar, sends confirmations
 - **Hands off to a human (you)** only when needed — escalation rules you control
 
-This is a complete, production-ready SaaS starter kit. Not a demo, not a tutorial: 35 frontend pages, 37 API routes, multi-tenant Supabase RLS, full TypeScript strict, GDPR endpoints (Art. 15 / Art. 17), Stripe subscriptions, Italian SDI electronic invoicing, CSP nonce middleware, PII redaction in logs, 369 tests passing, production build verified.
+### Honest state of play
+
+This is a **v0.1 backend engine with a marketing site on top**, not a turnkey product. We publish the
+gap rather than let you discover it after cloning.
+
+| Layer | State |
+|---|---|
+| Domain services (`src/server/`) | **Real.** Booking with availability + anti-double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. Covered by 369 tests. |
+| Database (`supabase/migrations/`) | **Real.** 22 tables, RLS policies, `timestamptz` throughout, money as integer cents, exclusion constraint against double-booking. |
+| Security primitives | **Real.** Stripe signature over raw body, timing-safe secret comparison, HMAC-signed OAuth state bound to tenant, AES-256-GCM for stored tokens, nonce-based CSP. |
+| Tenant dashboard + admin panel | **Not wired.** The pages render static placeholder data and do not call the API. Being connected in the current milestone. |
+| Self-service signup | **Not working.** Form encoding and the magic-link callback are being fixed in the current milestone. |
+| WhatsApp provisioning | **Missing.** No path yet to attach a tenant's own number; being added in the current milestone. |
+
+35 frontend pages, 37 API routes, TypeScript strict with `exactOptionalPropertyTypes`, 369 tests
+passing, production build verified. What that buys you today is a **serious, readable foundation to
+build on** — not something you can sell on Monday.
+
+See [docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md) for the full
+self-audit this table is drawn from.
 
 ---
 

@@ -6,10 +6,6 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const POST_META: Record<string, { title: string; category: string }> = {
-  'come-uno-studio-dentistico-recupera-12k-anno': {
-    title: 'Come uno studio dentistico recupera €12k/anno con la reception AI',
-    category: 'Case study',
-  },
   'whatsapp-business-vs-360dialog-quando-conviene': {
     title: 'WhatsApp Cloud API vs 360dialog: quando conviene cosa',
     category: 'Guida',

@@ -90,13 +90,9 @@ export const softwareApplicationSchema = {
     offerCount: 3,
     priceValidUntil: '2027-12-31',
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '24',
-    bestRating: '5',
-    worstRating: '1',
-  },
+  // Nessun `aggregateRating`: va pubblicato solo a fronte di recensioni reali e
+  // verificabili. Dichiararlo senza recensioni viola le policy sui dati
+  // strutturati di Google e configura una pratica commerciale ingannevole.
   inLanguage: 'it-IT',
   publisher: { '@id': `${SITE_URL}#organization` },
 } as const;

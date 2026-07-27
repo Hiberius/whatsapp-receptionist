@@ -3,57 +3,58 @@ import type { Metadata } from 'next';
 import { buildBreadcrumbSchema, JsonLd } from '@/components/marketing/JsonLd';
 import { SiteFooter } from '@/components/marketing/SiteFooter';
 import { SiteHeader } from '@/components/marketing/SiteHeader';
+import { type HealthStatus, overallStatus, runHealthChecks } from '@/lib/health/checks';
 
 export const metadata: Metadata = {
-  title: 'Stato del servizio · Uptime e incidenti',
+  title: 'Stato del servizio · Dipendenze in tempo reale',
   description:
-    'Stato in tempo reale dei servizi Ambrogio.ai. Uptime, latency, incidenti e provider di terze parti monitorati.',
+    'Stato in tempo reale delle dipendenze Ambrogio.ai: database, rate limiting, motore AI e fatturazione. Misurato a ogni richiesta, non dichiarato.',
   alternates: { canonical: '/status' },
   openGraph: {
     title: 'Stato del servizio · Ambrogio.ai',
-    description: 'Uptime, incidenti e dipendenze in tempo reale.',
+    description: 'Stato in tempo reale delle dipendenze di sistema.',
     url: '/status',
     type: 'website',
     locale: 'it_IT',
   },
 };
 
-const SERVICES = [
-  { name: 'API Ambrogio', status: 'operational', uptime: '99.98%' },
-  { name: 'WhatsApp ingestion', status: 'operational', uptime: '99.95%' },
-  { name: 'Voice pipeline (ElevenLabs)', status: 'operational', uptime: '99.92%' },
-  { name: 'Calendar sync (Google)', status: 'operational', uptime: '99.97%' },
-  { name: 'Billing (Stripe)', status: 'operational', uptime: '99.99%' },
-  { name: 'AI engine (Anthropic)', status: 'degraded', uptime: '99.85%' },
-  { name: 'Rate limit (Upstash)', status: 'operational', uptime: '99.99%' },
-  { name: 'Database (Supabase)', status: 'operational', uptime: '99.99%' },
-] as const;
+/**
+ * Rigenerata al massimo ogni 60s: la pagina dichiara questa frequenza
+ * all'utente, quindi il valore deve restare allineato al testo mostrato.
+ */
+export const revalidate = 60;
 
-const STATUS_LABEL = {
-  operational: { label: 'Operativo', color: 'var(--color-success)' },
+const STATUS_PRESENTATION: Record<HealthStatus, { label: string; color: string }> = {
+  ok: { label: 'Operativo', color: 'var(--color-success)' },
   degraded: { label: 'Performance ridotte', color: 'var(--color-warning)' },
-  outage: { label: 'Disservizio', color: 'var(--color-danger)' },
-} as const;
+  down: { label: 'Non raggiungibile', color: 'var(--color-danger)' },
+};
 
-const RECENT_INCIDENTS = [
-  {
-    date: '02/05/2026',
-    title: 'AI engine latency spike',
-    duration: '23 min',
-    status: 'resolved',
-    body: 'Latency p95 elevata su Anthropic API tra 14:12 e 14:35. Auto-fallback OpenAI ha mitigato impatto utenti.',
+const OVERALL_PRESENTATION: Record<
+  HealthStatus,
+  { label: string; background: string; color: string }
+> = {
+  ok: {
+    label: 'Tutte le dipendenze rispondono',
+    background: 'var(--color-success-soft)',
+    color: 'var(--color-success)',
   },
-  {
-    date: '24/04/2026',
-    title: 'WhatsApp Cloud API outage',
-    duration: '12 min',
-    status: 'resolved',
-    body: 'Outage upstream Meta WhatsApp. Messaggi accodati e processati al ripristino.',
+  degraded: {
+    label: 'Performance ridotte su alcune dipendenze',
+    background: 'var(--color-warning-soft)',
+    color: 'var(--color-warning)',
   },
-] as const;
+  down: {
+    label: 'Una o più dipendenze non rispondono',
+    background: 'var(--color-danger-soft)',
+    color: 'var(--color-danger)',
+  },
+};
 
-export default function StatusPage() {
-  const allOperational = SERVICES.every((s) => s.status === 'operational');
+export default async function StatusPage() {
+  const checks = await runHealthChecks();
+  const overall = OVERALL_PRESENTATION[overallStatus(checks)];
 
   return (
     <>
@@ -80,10 +81,8 @@ export default function StatusPage() {
                   gap: 'var(--space-3)',
                   padding: 'var(--space-3) var(--space-5)',
                   borderRadius: 'var(--radius-full)',
-                  background: allOperational
-                    ? 'var(--color-success-soft)'
-                    : 'var(--color-warning-soft)',
-                  color: allOperational ? 'var(--color-success)' : 'var(--color-warning)',
+                  background: overall.background,
+                  color: overall.color,
                   fontWeight: 600,
                   fontSize: 'var(--text-base)',
                   margin: '0 auto',
@@ -91,15 +90,13 @@ export default function StatusPage() {
                 }}
               >
                 <span aria-hidden="true">●</span>
-                {allOperational
-                  ? 'Tutti i sistemi operativi'
-                  : 'Performance degradate su alcuni servizi'}
+                {overall.label}
               </div>
               <p className="muted" style={{ fontSize: 'var(--text-sm)' }}>
-                Aggiornato:{' '}
+                Rilevazione:{' '}
                 {new Date().toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}
                 {' · '}
-                Auto-refresh ogni 60s
+                aggiornata al massimo ogni 60s
               </p>
             </div>
 
@@ -111,14 +108,14 @@ export default function StatusPage() {
                   background: 'var(--color-surface-sunken)',
                 }}
               >
-                <h2 style={{ fontSize: 'var(--text-lg)' }}>Componenti</h2>
+                <h2 style={{ fontSize: 'var(--text-lg)' }}>Dipendenze</h2>
               </header>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {SERVICES.map((service, index) => {
-                  const status = STATUS_LABEL[service.status];
+                {checks.map((check, index) => {
+                  const presentation = STATUS_PRESENTATION[check.status];
                   return (
                     <li
-                      key={service.name}
+                      key={check.name}
                       style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr auto auto',
@@ -128,14 +125,18 @@ export default function StatusPage() {
                         borderTop: index === 0 ? 'none' : '1px solid var(--color-border)',
                       }}
                     >
-                      <span style={{ fontWeight: 500 }}>{service.name}</span>
+                      <span style={{ fontWeight: 500 }}>{check.label}</span>
                       <span className="muted mono" style={{ fontSize: 'var(--text-xs)' }}>
-                        {service.uptime} · 90gg
+                        {check.latencyMs === undefined ? '—' : `${check.latencyMs} ms`}
                       </span>
                       <span
-                        style={{ color: status.color, fontSize: 'var(--text-sm)', fontWeight: 600 }}
+                        style={{
+                          color: presentation.color,
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 600,
+                        }}
                       >
-                        ● {status.label}
+                        ● {presentation.label}
                       </span>
                     </li>
                   );
@@ -147,27 +148,19 @@ export default function StatusPage() {
 
         <section className="section section-divider">
           <div className="container">
-            <div className="stack stack-6" style={{ maxWidth: '720px', margin: '0 auto' }}>
-              <h2>Incidenti recenti</h2>
-
-              {RECENT_INCIDENTS.map((incident) => (
-                <article key={incident.title} className="card stack stack-3">
-                  <div className="row-between">
-                    <h3 style={{ fontSize: 'var(--text-lg)' }}>{incident.title}</h3>
-                    <span className="badge badge-success">Risolto</span>
-                  </div>
-                  <p className="muted mono" style={{ fontSize: 'var(--text-xs)' }}>
-                    {incident.date} · durata {incident.duration}
-                  </p>
-                  <p style={{ color: 'var(--color-text-secondary)' }}>{incident.body}</p>
-                </article>
-              ))}
-
-              <p className="muted text-center" style={{ fontSize: 'var(--text-sm)' }}>
-                Storico completo:{' '}
-                <a href="https://status.ambrogio.ai/history" className="btn-link">
-                  status.ambrogio.ai/history
-                </a>
+            <div className="stack stack-4" style={{ maxWidth: '720px', margin: '0 auto' }}>
+              <h2>Come leggere questa pagina</h2>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                Ogni riga è una probe reale eseguita al caricamento della pagina verso il provider
+                indicato, con la latenza effettivamente misurata. Non pubblichiamo percentuali di
+                uptime storico: non abbiamo ancora un sistema di monitoraggio continuo che le
+                produca, e riportare numeri che non misuriamo sarebbe un&apos;affermazione priva di
+                riscontro.
+              </p>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                Lo stesso dato è disponibile in formato macchina su{' '}
+                <code className="mono">/api/health/deep</code>, utilizzabile come endpoint di
+                monitoraggio esterno.
               </p>
             </div>
           </div>

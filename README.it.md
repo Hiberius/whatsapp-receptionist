@@ -32,7 +32,26 @@ In 3 frasi:
 - **Capisce l'intent, prende appuntamenti veri** su Google Calendar, manda conferme
 - **Passa la palla a un umano** (te) solo quando serve — regole di escalation che decidi tu
 
-Non è una demo, non è un tutorial. È uno starter kit SaaS completo, pronto per la produzione: 35 pagine frontend, 37 API route, multi-tenant Supabase RLS, TypeScript strict, endpoint GDPR (Art. 15 e Art. 17), Stripe + fatturazione elettronica SDI italiana, 369 test verdi, build di produzione verificata.
+### Stato reale del progetto
+
+Questo è un **motore backend v0.1 con sopra un sito di presentazione**, non un prodotto chiavi in
+mano. Preferiamo dichiarare il divario invece di lasciartelo scoprire dopo il clone.
+
+| Livello | Stato |
+|---|---|
+| Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo anti-doppia-prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. Coperti da 369 test. |
+| Database (`supabase/migrations/`) | **Reale.** 22 tabelle, policy RLS, `timestamptz` ovunque, importi in centesimi interi, exclusion constraint contro la doppia prenotazione. |
+| Primitivi di sicurezza | **Reali.** Firma Stripe sul raw body, confronto timing-safe, state OAuth firmato HMAC e legato al tenant, AES-256-GCM sui token salvati, CSP con nonce. |
+| Dashboard tenant e pannello admin | **Non collegati.** Le pagine mostrano dati segnaposto statici e non chiamano le API. In collegamento nella milestone corrente. |
+| Registrazione self-service | **Non funzionante.** Encoding dei form e callback del magic link in correzione nella milestone corrente. |
+| Provisioning WhatsApp | **Assente.** Non esiste ancora un percorso per collegare il numero del tenant; in aggiunta nella milestone corrente. |
+
+35 pagine frontend, 37 API route, TypeScript strict con `exactOptionalPropertyTypes`, 369 test
+verdi, build di produzione verificata. Quello che ottieni oggi è una **base seria e leggibile su cui
+costruire** — non qualcosa da vendere lunedì.
+
+L'audit completo da cui è tratta questa tabella:
+[docs/audit/2026-07-27-audit-prodotto.md](docs/audit/2026-07-27-audit-prodotto.md).
 
 ---
 

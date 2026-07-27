@@ -23,24 +23,6 @@ interface Post {
 }
 
 const POSTS: Record<string, Post> = {
-  'come-uno-studio-dentistico-recupera-12k-anno': {
-    slug: 'come-uno-studio-dentistico-recupera-12k-anno',
-    title: 'Come uno studio dentistico recupera €12k/anno con la reception AI',
-    seoTitle: 'Studio dentistico: +€12k con AI reception',
-    excerpt:
-      'Caso reale: Studio Dentistico Rossi di Milano, 38% di booking notturni in più nei primi 90 giorni.',
-    body: `Lo Studio Dentistico Rossi di Milano riceveva mediamente 8 chiamate fuori orario al giorno. Di queste, solo 1 su 5 si convertiva in appuntamento il giorno dopo: il resto era cliente perso, deluso, o semplicemente trattenuto da un’altra preferenza.\n\nDopo aver attivato Ambrogio.ai, le 8 chiamate fuori orario sono diventate conversazioni WhatsApp gestite automaticamente. Il 73% di queste si è convertito in booking confermato sul calendario Google della dottoressa.\n\nNumeri concreti dei primi 90 giorni: +38% booking notturni, -68% no-show grazie ai reminder automatici, €12.400 di fatturato aggiuntivo recuperato.\n\nMa il vero impatto non è il numero: è la qualità della giornata. La segretaria non interrompe più ogni 15 minuti per rispondere al telefono. La dottoressa arriva al mattino con l’agenda già piena. I pazienti ricevono una conferma in 30 secondi anche alle 22 di sera.`,
-    date: '5 maggio 2026',
-    isoDate: '2026-05-05',
-    readTime: '6 min',
-    category: 'Case study',
-    relatedVerticalSlug: 'dental',
-    relatedVerticalLabel: 'Ambrogio per studi dentistici',
-    relatedPostSlugs: [
-      'whatsapp-business-vs-360dialog-quando-conviene',
-      'gdpr-receptionist-ai-dpa-template',
-    ],
-  },
   'whatsapp-business-vs-360dialog-quando-conviene': {
     slug: 'whatsapp-business-vs-360dialog-quando-conviene',
     title: 'WhatsApp Cloud API vs 360dialog: quando conviene cosa',
@@ -53,10 +35,7 @@ const POSTS: Record<string, Post> = {
     category: 'Guida',
     relatedVerticalSlug: null,
     relatedVerticalLabel: null,
-    relatedPostSlugs: [
-      'come-uno-studio-dentistico-recupera-12k-anno',
-      'gdpr-receptionist-ai-dpa-template',
-    ],
+    relatedPostSlugs: ['gdpr-receptionist-ai-dpa-template'],
   },
   'gdpr-receptionist-ai-dpa-template': {
     slug: 'gdpr-receptionist-ai-dpa-template',
@@ -70,10 +49,7 @@ const POSTS: Record<string, Post> = {
     category: 'GDPR',
     relatedVerticalSlug: 'professional',
     relatedVerticalLabel: 'Ambrogio per studi professionali',
-    relatedPostSlugs: [
-      'come-uno-studio-dentistico-recupera-12k-anno',
-      'whatsapp-business-vs-360dialog-quando-conviene',
-    ],
+    relatedPostSlugs: ['whatsapp-business-vs-360dialog-quando-conviene'],
   },
 };
 
