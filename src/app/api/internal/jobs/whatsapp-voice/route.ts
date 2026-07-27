@@ -2,9 +2,8 @@ import { z } from 'zod';
 import { type NextRequest, type NextResponse } from 'next/server';
 
 import { jsonHandler } from '@/lib/api/json';
-import { env } from '@/lib/env';
 import { AppError } from '@/lib/errors/app-error';
-import { assertStaticSecretHeader } from '@/lib/security/static-secret';
+import { assertInternalJobAuth } from '@/lib/security/internal-job-auth';
 import { createWhatsAppVoicePipelineWorker } from '@/server/whatsapp/voice-pipeline';
 
 export const runtime = 'nodejs';
@@ -15,12 +14,7 @@ const ProcessVoiceJobsBodySchema = z.object({
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return jsonHandler(async (context) => {
-    assertStaticSecretHeader({
-      headers: request.headers,
-      headerName: env.INTERNAL_JOB_HEADER_NAME,
-      expectedSecret: env.INTERNAL_JOB_SECRET,
-      notConfiguredMessage: 'Internal job secret is not configured',
-    });
+    assertInternalJobAuth(request.headers);
 
     const body = ProcessVoiceJobsBodySchema.parse(await readOptionalJson(request));
     const worker = createWhatsAppVoicePipelineWorker();
@@ -47,4 +41,12 @@ async function readOptionalJson(request: NextRequest): Promise<unknown> {
       expose: true,
     });
   }
+}
+
+/**
+ * Vercel Cron invoca i job in `GET` e non può inviare header custom: senza
+ * questo handler lo scheduler riceveva 405 e il job non girava mai.
+ */
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return POST(request);
 }

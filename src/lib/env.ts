@@ -14,6 +14,13 @@ const envSchema = z.object({
   SUPABASE_MEDIA_BUCKET: z.string().default('ambrogio-media'),
   INTERNAL_JOB_SECRET: z.string().optional().default(''),
   INTERNAL_JOB_HEADER_NAME: z.string().default('x-ambrogio-job-secret'),
+  /**
+   * Segreto usato da Vercel Cron, che invoca i job in GET con
+   * `Authorization: Bearer <CRON_SECRET>` e non può inviare header custom.
+   * Se assente si ricade su INTERNAL_JOB_SECRET, così il self-hosting continua
+   * a funzionare con una sola variabile configurata.
+   */
+  CRON_SECRET: z.string().optional().default(''),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
   ANTHROPIC_MODEL_PRIMARY: z.string().optional().default(''),
   ANTHROPIC_MODEL_FAST: z.string().optional().default(''),
