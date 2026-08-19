@@ -9,6 +9,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    // The embedded Postgres suite is intentionally isolated from fast unit
+    // tests so its WASM startup cannot cause unrelated 5s smoke timeouts.
+    exclude: ['tests/database/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'json-summary'],

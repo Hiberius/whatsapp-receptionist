@@ -1485,3 +1485,29 @@ Cosa Codex deve fare al rientro:
 Ownership tornata a Codex il 1 maggio 2026 (rientro previsto).
 
 — Claude Code
+
+## 2026-08-19 - Phase 1: Tenant Isolation and Dependency Security - Codex
+
+Scope limited to P0-1 through P0-4 for the managed US `en-US` pilot. No production code under `src/` was changed.
+
+Implemented:
+
+- Added a real PostgreSQL-engine tenant A/B suite with PGlite, plus an official Supabase CLI/pgTAP suite and a Docker-backed GitHub Actions job.
+- Added a forward migration that makes `current_tenant_role()` read and allow-list `app_metadata.role` (`owner`, `admin`, `member`).
+- Added composite tenant foreign keys for MVP message, appointment and WhatsApp outbox relationships so service-role writes cannot cross-link tenant resources.
+- Added source-level security contracts for 28 critical service-role repository methods.
+- Fixed the legacy fresh-database migration failure without editing history: a compatibility migration now creates the appointment table and a valid immutable overlap range before the initial migration.
+- Updated `nanoid`, `js-yaml` and `brace-expansion` lockfile resolutions; full and production npm audits now report zero vulnerabilities.
+- Hardened migration lint so it checks the effective final tenant-role function and the new tenant relationship constraints.
+
+Verification on Node.js 22.23.2:
+
+- Existing tests: 544/544 passed.
+- New service-role boundary tests: 28/28 passed.
+- New PostgreSQL tenant-isolation tests: 16/16 passed.
+- TypeScript passed; ESLint passed with 0 errors and 4 pre-existing warnings; DB lint passed for 22 RLS tables.
+- Full and production-only npm audits: 0 vulnerabilities.
+- Next.js compiled and generated all 94 pages, then hit the previously documented Windows `outputFileTracingRoot` trace failure (`EPERM C:\Users\Users`), still assigned to P0-8.
+- Official local Supabase pgTAP execution remains pending because Docker/Podman is unavailable on this workstation; CI coverage was added and must be green before Phase 2.
+
+Detailed Japanese handoff: `PHASE1_RESULT.md`.

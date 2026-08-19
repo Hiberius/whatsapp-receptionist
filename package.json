@@ -48,6 +48,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:db": "vitest run --config vitest.database.config.ts",
+    "test:db:supabase": "npx --yes supabase@2.115.0 test db",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -82,6 +84,8 @@
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.5",
+    "@electric-sql/pglite-pgvector": "0.0.6",
     "@eslint/eslintrc": "^3.3.5",
     "@playwright/test": "^1.62.0",
     "@types/node": "^25.0.2",
