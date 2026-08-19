@@ -35,6 +35,26 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
+const tenantRoleDefinitions = [
+  ...sql.matchAll(
+    /create or replace function public\.current_tenant_role\(\)[\s\S]*?as \$\$([\s\S]*?)\$\$;/gi,
+  ),
+];
+const effectiveTenantRoleDefinition = tenantRoleDefinitions.at(-1)?.[1] ?? '';
+
+if (
+  !effectiveTenantRoleDefinition.includes("auth.jwt() -> 'app_metadata' ->> 'role'") ||
+  effectiveTenantRoleDefinition.includes("auth.jwt() ->> 'role'") ||
+  !['owner', 'admin', 'member'].every((role) =>
+    effectiveTenantRoleDefinition.includes(`when '${role}' then '${role}'`),
+  )
+) {
+  console.error(
+    'La definizione effettiva di current_tenant_role() deve usare solo i ruoli tenant consentiti in app_metadata.',
+  );
+  process.exit(1);
+}
+
 const requiredSnippets = [
   "auth.jwt() -> 'app_metadata' ->> 'tenant_id'",
   "auth.jwt() -> 'app_metadata' ->> 'role'",
@@ -60,6 +80,11 @@ const requiredSnippets = [
   'calendar_sync_status text not null default',
   'appointments_tenant_status_scheduled_idx',
   'appointments_no_confirmed_overlap',
+  'create or replace function public.appointment_time_range',
+  'messages_tenant_conversation_fkey',
+  'appointments_tenant_conversation_fkey',
+  'appointments_tenant_service_fkey',
+  'whatsapp_outbox_jobs_tenant_message_fkey',
   'create extension if not exists "btree_gist"',
   'revoke execute on function public.claim_whatsapp_outbox_jobs',
   'grant execute on function public.claim_whatsapp_outbox_jobs',

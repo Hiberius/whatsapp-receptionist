@@ -6,6 +6,26 @@ on:
     branches: [main]
 
 jobs:
+  database-integration:
+    name: Supabase tenant isolation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:db
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.115.0
+      - run: supabase start
+      - run: supabase test db
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup
+
   verify:
     name: Verify (typecheck + lint + test + db:lint)
     runs-on: ubuntu-latest
@@ -122,7 +142,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   dependency-audit:
-    name: Dependency audit (production)
+    name: Dependency audit (production + development)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -136,3 +156,4 @@ jobs:
       # (ESLint) i cui input sono i nostri stessi file di configurazione, non
       # input di un attaccante — vedi docs/SECURITY-AUDIT-NOTES.md.
       - run: npm audit --omit=dev --audit-level=high
+      - run: npm audit --audit-level=high
