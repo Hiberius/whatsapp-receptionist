@@ -1,11 +1,15 @@
 <div align="center">
-  <img src="docs/screenshots/hero-banner.svg" alt="WhatsApp Receptionist — open-source AI receptionist that books real appointments on WhatsApp" width="100%" />
 
-# WhatsApp Receptionist
+# AI Scheduling Advisor
 
-### The open-source AI receptionist that books real appointments on WhatsApp
+### Explainable appointment scheduling with deterministic ranking and auditable decisions
 
-**Crafted in Italy 🇮🇹 · GDPR-first · Self-hostable · MIT**
+**Portfolio extension of the MIT-licensed [Hiberius/whatsapp-receptionist](https://github.com/Hiberius/whatsapp-receptionist) project.**
+
+The WhatsApp receptionist application underneath — transport, AI reply orchestration, booking
+engine, Google Calendar, auth, Supabase multi-tenancy, dashboard, billing, GDPR — is upstream work
+by Christian Calabrò. This fork adds a deterministic, explainable slot ranker and an auditable
+scheduling decision ledger on top of it. Full breakdown: [`ATTRIBUTION.md`](ATTRIBUTION.md).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Built with Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
@@ -14,16 +18,86 @@
 [![Anthropic Claude](https://img.shields.io/badge/Anthropic-Claude-D97757?logo=anthropic)](https://anthropic.com)
 [![Tests](https://img.shields.io/badge/tests-579%20+%2056%20E2E-brightgreen)](#quality-gate)
 [![Production vulnerabilities](https://img.shields.io/badge/prod%20vulnerabilities-0-brightgreen)](docs/SECURITY-AUDIT-NOTES.md)
-[![GDPR](https://img.shields.io/badge/GDPR-first-2563eb)](#gdpr--security)
-[![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
 
-[Project status](docs/PROJECT-STATUS.md) · [Quickstart](#quickstart) · [Documentation](docs/) · [Roadmap](docs/ROADMAP.md) · [Italiano 🇮🇹](README.it.md)
+[What this fork adds](#what-this-fork-adds) · [Quickstart](#quickstart) · [Slot ranking](#deterministic-slot-ranking) · [Attribution](ATTRIBUTION.md) · [Upstream project](https://github.com/Hiberius/whatsapp-receptionist) · [Italiano 🇮🇹](README.it.md)
 
 </div>
 
 ---
 
-## What it does
+## What this fork adds
+
+Upstream already books appointments end to end. What it does not do is explain *why* it offered the
+three slots it offered, or leave anything behind that an auditor could read afterwards. That is the
+gap this fork fills.
+
+**Inherited upstream flow**
+
+```
+WhatsApp message
+  → intent extraction
+  → availability lookup
+  → booking slots
+  → confirmation
+  → appointment write
+```
+
+**Portfolio extension, inserted at the slot-proposal seam**
+
+```
+available candidate slots
+  → deterministic scoring
+  → structured reasons
+  → stable ranking
+  → top 3
+  → scheduling decision ledger
+  → existing confirmation flow (unchanged)
+```
+
+**The LLM does not determine ranking.** The model extracts a structured booking request from the
+message; ordering the candidate slots is a pure function of that request plus an injected reference
+time. No network, no database, no clock read, no model call. Same inputs, same order, every time —
+whatever order the candidates arrive in.
+
+The ranking signals actually implemented:
+
+- **requested date match** — the date window the extractor parsed from the message
+- **time preference match** — the requested day part (morning / afternoon / evening / explicit hour)
+- **explicit-hour proximity** — distance from an "at 15" / "after 15" request
+- **earliest suitable availability** — how soon the slot is, relative to the reference time
+
+Current scope, stated plainly:
+
+- **Initial booking proposals: ranked** and recorded in the ledger.
+- **Reschedule proposals: not yet ranked** — that flow still offers the first three available slots,
+  unranked and unrecorded.
+
+Ranking is off by default and gated behind `SCHEDULING_RANKING_ENABLED`. Details, weights and
+tie-breaking rules: [Deterministic slot ranking](#deterministic-slot-ranking).
+
+---
+
+## Inherited vs. added
+
+| Inherited from upstream | Added in this fork |
+|---|---|
+| WhatsApp message flow, voice pipeline, outbox | Deterministic `rankSlots()` pure function |
+| AI reply orchestration and intent routing | Structured, per-signal scoring reasons that sum to the score |
+| Google Calendar OAuth and free/busy | Stable tie-breaking (score → start time → slot identity) |
+| Booking availability engine | `scheduling_decisions` ledger with RLS, written fail-open |
+| Confirmation and appointment write flow | `SCHEDULING_RANKING_ENABLED` feature flag and its integration seam |
+| Supabase multi-tenancy, auth, RLS infrastructure | Ranking unit, golden and determinism regression tests |
+| Dashboard, Stripe billing, GDPR endpoints | Portfolio documentation and attribution |
+
+Nothing in the left column was authored here. The extension is additive and reversible: with the
+flag off — the default — the booking flow behaves exactly as upstream does.
+
+---
+
+## The base application (inherited)
+
+Everything in this section is the upstream project, described as it stands. It is the platform the
+scheduling extension plugs into, not work claimed here.
 
 A customer sends a WhatsApp message — text or voice note — at 22:40 on a Sunday. The AI understands
 what they want, checks the real availability on your calendar, books the appointment, and confirms
@@ -42,10 +116,10 @@ coming.
 
 ---
 
-## Honest state of play
+## Honest state of play (base application)
 
 Most open-source READMEs describe the best version of the project. This one describes the actual
-one. The full breakdown, with the commands to reproduce every number, is in
+one. The table below covers the inherited application. The full breakdown, with the commands to reproduce every number, is in
 **[docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md)**.
 
 | Layer | State |
@@ -71,8 +145,8 @@ tests · production build verified · zero vulnerabilities in production depende
 ## Quickstart
 
 ```bash
-git clone https://github.com/Hiberius/whatsapp-receptionist.git
-cd whatsapp-receptionist
+git clone https://github.com/valencijdavid-ui/ai-scheduling-advisor.git
+cd ai-scheduling-advisor
 cp .env.example .env.local
 npm ci
 npm run dev
@@ -275,10 +349,15 @@ removing.
 
 ## A note on branding
 
-The repository is the generic **WhatsApp Receptionist**. The application still ships with the
-**Ambrogio.ai** brand — copy, logo and Italian marketing pages — because that is the product it was
-extracted from. Everything user-facing is yours to replace: strings live in the marketing components
-and `NEXT_PUBLIC_APP_NAME`, and the design tokens are in `src/styles/tokens.css`.
+**AI Scheduling Advisor** is the identity of *this repository* — the portfolio work described at the
+top. The running application has deliberately **not** been rebranded: it still ships upstream's
+**Ambrogio.ai** product identity — copy, logo, Italian marketing pages — and upstream's naming for
+database entities, environment variables, API routes and source modules. Mass-renaming a codebase
+you did not write is noise, not contribution, so this pass changed repository and documentation
+identity only.
+
+Everything user-facing is yours to replace: strings live in the marketing components and
+`NEXT_PUBLIC_APP_NAME`, and the design tokens are in `src/styles/tokens.css`.
 
 The interface language is Italian. English translation is not done.
 
@@ -296,11 +375,11 @@ administration — that panel is not wired.
 
 ---
 
-## Why this exists
+## Why the base project exists
 
-There are AI chatbots and there are booking systems. Nothing combined them with European GDPR rigour
-and Italian B2B fiscal compliance. This started as a real deployment for a clinic and became the
-thing that was missing.
+In the upstream author's words: there are AI chatbots and there are booking systems, and nothing
+combined them with European GDPR rigour and Italian B2B fiscal compliance. Upstream started as a
+real deployment for a clinic and became the thing that was missing.
 
 Version 0.2 was rebuilt with **Claude Opus 5 in ultracode mode** — Anthropic's multi-agent
 orchestration. An eight-dimension audit where every auditor was followed by an adversarial verifier
@@ -359,8 +438,10 @@ Portions of this repository are portfolio extensions built on top of that origin
 
 <div align="center">
 
-Made in Italy by Christian Calabrò ([@Hiberius](https://github.com/Hiberius))
+**AI Scheduling Advisor** — a portfolio extension by [@valencijdavid-ui](https://github.com/valencijdavid-ui).
 
-If it saved you time, [star the repo](https://github.com/Hiberius/whatsapp-receptionist).
+Built on [whatsapp-receptionist](https://github.com/Hiberius/whatsapp-receptionist), made in Italy by
+Christian Calabrò ([@Hiberius](https://github.com/Hiberius)). If the base project saved you time,
+[star it](https://github.com/Hiberius/whatsapp-receptionist).
 
 </div>

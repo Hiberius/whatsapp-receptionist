@@ -1,16 +1,16 @@
 {
-  "name": "whatsapp-receptionist",
+  "name": "ai-scheduling-advisor",
   "version": "0.2.1",
   "private": false,
   "type": "module",
-  "description": "Open-source AI receptionist for WhatsApp. Books real appointments, transcribes voice messages, integrates with Google Calendar and Stripe. Multi-tenant SaaS starter kit. Crafted in Italy with GDPR built-in.",
+  "description": "Portfolio extension of the MIT-licensed Hiberius/whatsapp-receptionist project: deterministic, explainable appointment-slot ranking and an auditable scheduling decision ledger on top of its multi-tenant WhatsApp booking platform.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hiberius/whatsapp-receptionist.git"
+    "url": "git+https://github.com/valencijdavid-ui/ai-scheduling-advisor.git"
   },
-  "homepage": "https://github.com/Hiberius/whatsapp-receptionist#readme",
+  "homepage": "https://github.com/valencijdavid-ui/ai-scheduling-advisor#readme",
   "bugs": {
-    "url": "https://github.com/Hiberius/whatsapp-receptionist/issues"
+    "url": "https://github.com/valencijdavid-ui/ai-scheduling-advisor/issues"
   },
   "author": {
     "name": "Christian Calabrò",
@@ -36,7 +36,11 @@
     "open-source",
     "self-hosted",
     "appointments",
-    "booking"
+    "booking",
+    "scheduling",
+    "explainable-ranking",
+    "deterministic-ranking",
+    "audit-trail"
   ],
   "scripts": {
     "dev": "next dev",

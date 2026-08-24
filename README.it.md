@@ -1,3 +1,15 @@
+> **Nota — AI Scheduling Advisor**
+>
+> Questo repository è **AI Scheduling Advisor**, un fork-portfolio del progetto MIT
+> [Hiberius/whatsapp-receptionist](https://github.com/Hiberius/whatsapp-receptionist): aggiunge un
+> ranking deterministico e spiegabile degli slot e un registro auditabile delle decisioni di
+> scheduling.
+>
+> La documentazione di portfolio è **[README.md](README.md)**: è il documento primario e l'unico che
+> descrive le aggiunte del fork. Il documento italiano qui sotto descrive in larga parte
+> l'applicazione originale a monte, il cui autore è Christian Calabrò — vedi
+> [ATTRIBUTION.md](ATTRIBUTION.md).
+
 <div align="center">
   <img src="docs/screenshots/hero-banner.svg" alt="WhatsApp Receptionist — il receptionist AI open source che prende appuntamenti veri su WhatsApp" width="100%" />
 

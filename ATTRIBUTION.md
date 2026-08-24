@@ -1,5 +1,7 @@
 # Attribution
 
+**AI Scheduling Advisor** is a portfolio extension, not an original application.
+
 Built on [whatsapp-receptionist](https://github.com/Hiberius/whatsapp-receptionist) by
 **Christian Calabrò**, released under the MIT License.
 
