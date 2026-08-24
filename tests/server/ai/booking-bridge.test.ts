@@ -17,6 +17,11 @@ import type {
   CreateAppointmentInput,
   RescheduleAppointmentInput,
 } from '@/server/appointments/booking';
+import type {
+  SchedulingDecisionInput,
+  SchedulingDecisionLedger,
+} from '@/server/appointments/decision-ledger';
+import { SLOT_RANKING_VERSION } from '@/server/appointments/slot-ranking';
 
 const occurredAt = new Date('2026-04-27T07:00:00.000Z');
 
@@ -599,6 +604,241 @@ describe('BookingBridgeService', () => {
   });
 });
 
+/**
+ * Ranking deterministico degli slot (flag SCHEDULING_RANKING_ENABLED).
+ *
+ * Il flag viene passato esplicitamente al costruttore: i test non dipendono
+ * dall'ambiente, e la regressione "flag spento = comportamento di prima" resta
+ * verificabile anche su una macchina che ha il flag acceso in .env.local.
+ */
+describe('BookingBridgeService — slot ranking', () => {
+  /**
+   * Slot volutamente fuori ordine cronologico: con il ranking spento devono
+   * uscire nell'ordine in cui li produce il motore di disponibilità, con il
+   * ranking acceso nell'ordine deciso dal ranker.
+   */
+  function unorderedSlots(): BookingSlot[] {
+    return [
+      slot('2026-04-30T09:00:00.000Z', '2026-04-30T09:30:00.000Z'),
+      slot('2026-04-28T09:00:00.000Z', '2026-04-28T09:30:00.000Z'),
+      slot('2026-04-29T09:00:00.000Z', '2026-04-29T09:30:00.000Z'),
+      slot('2026-05-02T09:00:00.000Z', '2026-05-02T09:30:00.000Z'),
+    ];
+  }
+
+  it('keeps the existing first-three selection when the flag is off', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const ledger = new FakeSchedulingDecisionLedger();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: false, decisionLedger: ledger },
+    );
+
+    const reply = await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(reply.metadata).toMatchObject({ bookingBridge: { action: 'slots_proposed' } });
+    expect(savedSlots(repository).map((item) => item.start)).toEqual([
+      '2026-04-30T09:00:00.000Z',
+      '2026-04-28T09:00:00.000Z',
+      '2026-04-29T09:00:00.000Z',
+    ]);
+    expect(ledger.records).toEqual([]);
+  });
+
+  it('proposes the top three ranked slots when the flag is on', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const ledger = new FakeSchedulingDecisionLedger();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: ledger },
+    );
+
+    const reply = await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(reply.metadata).toMatchObject({ bookingBridge: { action: 'slots_proposed' } });
+    expect(savedSlots(repository).map((item) => item.start)).toEqual([
+      '2026-04-28T09:00:00.000Z',
+      '2026-04-29T09:00:00.000Z',
+      '2026-04-30T09:00:00.000Z',
+    ]);
+  });
+
+  it('keeps the pending slot shape unchanged when ranking', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: new FakeSchedulingDecisionLedger() },
+    );
+
+    await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(savedSlots(repository)[0]).toEqual({
+      serviceId: 'service_1',
+      serviceName: 'Prima visita',
+      start: '2026-04-28T09:00:00.000Z',
+      end: '2026-04-28T09:30:00.000Z',
+      durationMinutes: 30,
+      timezone: 'UTC',
+    });
+  });
+
+  it('persists every scored candidate in ranked order', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const ledger = new FakeSchedulingDecisionLedger();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: ledger },
+    );
+
+    await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(ledger.records).toHaveLength(1);
+    const decision = ledger.records[0];
+    expect(decision).toMatchObject({
+      tenantId: 'tenant_1',
+      conversationId: 'conversation_1',
+      rankingVersion: SLOT_RANKING_VERSION,
+    });
+    // Tutti e quattro i candidati valutati, non solo i tre proposti.
+    expect(decision?.candidates.map((candidate) => candidate.start)).toEqual([
+      '2026-04-28T09:00:00.000Z',
+      '2026-04-29T09:00:00.000Z',
+      '2026-04-30T09:00:00.000Z',
+      '2026-05-02T09:00:00.000Z',
+    ]);
+    // I primi tre candidati SONO gli slot proposti: nessuna colonna "selected".
+    expect(decision?.candidates.slice(0, 3).map((candidate) => candidate.start)).toEqual(
+      savedSlots(repository).map((item) => item.start),
+    );
+
+    for (const candidate of decision?.candidates ?? []) {
+      expect(candidate.reasons.reduce((total, reason) => total + reason.points, 0)).toBe(
+        candidate.score,
+      );
+    }
+
+    expect(decision?.explanation).toContain(SLOT_RANKING_VERSION);
+  });
+
+  it('records the decision even when no slot survives filtering', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = [];
+    const ledger = new FakeSchedulingDecisionLedger();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: ledger },
+    );
+
+    const reply = await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(reply.metadata).toMatchObject({ bookingBridge: { action: 'no_slots_available' } });
+    expect(ledger.records[0]?.candidates).toEqual([]);
+    expect(ledger.records[0]?.explanation).toBeNull();
+  });
+
+  it('answers normally when the ledger write fails', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const ledger = new FakeSchedulingDecisionLedger();
+    ledger.failure = new Error('ledger unavailable');
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: ledger },
+    );
+
+    const reply = await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    expect(reply.handled).toBe(true);
+    expect(reply.replyText).toContain('Ho trovato questi slot');
+    expect(savedSlots(repository)).toHaveLength(3);
+  });
+
+  it('confirms exactly the ranked slot stored in conversation state', async () => {
+    const repository = new FakeBookingBridgeRepository([
+      serviceOption('service_1', 'Prima visita'),
+    ]);
+    const booking = new FakeAppointmentBookingService();
+    booking.slots = unorderedSlots();
+    const service = new BookingBridgeService(
+      repository,
+      booking as unknown as AppointmentBookingService,
+      undefined,
+      { rankingEnabled: true, decisionLedger: new FakeSchedulingDecisionLedger() },
+    );
+
+    await service.createBookingReply({
+      ...baseInput(),
+      text: 'Vorrei prenotare una prima visita',
+    });
+
+    const proposed = savedSlots(repository);
+
+    const confirmReply = await service.createBookingReply({
+      ...baseInput(),
+      text: 'confermo 2',
+    });
+
+    expect(confirmReply.metadata).toMatchObject({
+      bookingBridge: { action: 'appointment_created' },
+    });
+    expect(booking.createCalls).toHaveLength(1);
+    expect(booking.createCalls[0]?.scheduledAt.toISOString()).toBe(proposed[1]?.start);
+    expect(proposed[1]?.start).toBe('2026-04-29T09:00:00.000Z');
+  });
+});
+
 class FakeBookingBridgeRepository implements BookingBridgeRepository {
   savedState: ConversationBookingState | null = null;
   cleared = false;
@@ -630,6 +870,19 @@ class FakeBookingBridgeRepository implements BookingBridgeRepository {
 
   async listCustomerAppointments(): Promise<CustomerAppointmentForBridge[]> {
     return this.appointments;
+  }
+}
+
+class FakeSchedulingDecisionLedger implements SchedulingDecisionLedger {
+  records: SchedulingDecisionInput[] = [];
+  failure: Error | null = null;
+
+  async record(input: SchedulingDecisionInput): Promise<void> {
+    if (this.failure) {
+      throw this.failure;
+    }
+
+    this.records.push(input);
   }
 }
 
