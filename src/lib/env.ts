@@ -29,6 +29,15 @@ const envSchema = z.object({
     .default('false')
     .transform((value) => value === 'true'),
   AMBROGIO_VOICE_STT_MIN_CONFIDENCE: z.coerce.number().min(0).max(1).default(0.55),
+  /**
+   * Attiva il ranking deterministico degli slot di prenotazione e il relativo
+   * decision ledger. Con il flag a `false` il bridge propone i primi tre slot
+   * disponibili esattamente come prima: nessun ranker, nessuna scrittura.
+   */
+  SCHEDULING_RANKING_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   OPENAI_API_KEY: z.string().optional().default(''),
   OPENAI_EMBEDDING_MODEL: z.string().default('text-embedding-3-large'),
   ELEVENLABS_API_KEY: z.string().optional().default(''),

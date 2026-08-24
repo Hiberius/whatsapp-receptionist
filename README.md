@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Anthropic Claude](https://img.shields.io/badge/Anthropic-Claude-D97757?logo=anthropic)](https://anthropic.com)
-[![Tests](https://img.shields.io/badge/tests-544%20+%2056%20E2E-brightgreen)](#quality-gate)
+[![Tests](https://img.shields.io/badge/tests-579%20+%2056%20E2E-brightgreen)](#quality-gate)
 [![Production vulnerabilities](https://img.shields.io/badge/prod%20vulnerabilities-0-brightgreen)](docs/SECURITY-AUDIT-NOTES.md)
 [![GDPR](https://img.shields.io/badge/GDPR-first-2563eb)](#gdpr--security)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
@@ -51,7 +51,7 @@ one. The full breakdown, with the commands to reproduce every number, is in
 | Layer | State |
 |---|---|
 | Domain services (`src/server/`) | **Real.** Booking with availability and a GiST constraint against double-booking, Stripe subscription lifecycle, WhatsApp outbox with `FOR UPDATE SKIP LOCKED`, retry/backoff and dead-letter, webhook idempotency, Google Calendar OAuth, pgvector RAG, GDPR Art. 15/17. |
-| Database (`supabase/migrations/`) | **Real.** 22 tables, RLS on every one, `timestamptz` throughout, money as integer cents. |
+| Database (`supabase/migrations/`) | **Real.** 23 tables, RLS on every one, `timestamptz` throughout, money as integer cents. |
 | Security primitives | **Real.** Stripe signature over the raw body, timing-safe secret comparison, HMAC-signed OAuth state bound to the tenant, AES-256-GCM for stored credentials, nonce-based CSP. |
 | Self-service signup | **Working.** Register → magic link → `/auth/callback` → onboarding → dashboard, with auth guards on every authenticated segment. |
 | Tenant dashboard | **Working.** Dashboard, conversations inbox with operator reply, calendar, billing, WhatsApp settings, business hours, services, AI persona, knowledge base — all reading live tenant data. |
@@ -63,7 +63,7 @@ one. The full breakdown, with the commands to reproduce every number, is in
 | Tenant isolation | **Partly proven.** Repository filters are covered by regression tests that fail when a `tenant_id` filter is deleted. RLS itself is still never exercised at runtime. **The most important open item.** |
 | Cross-tenant admin panel | **Not wired.** Those reads bypass RLS and need a dedicated service with isolation tests. The screens say so rather than showing invented data. |
 
-**41 frontend pages · 41 API routes · 22 tables · 544 unit and integration tests · 56 Playwright E2E
+**41 frontend pages · 41 API routes · 23 tables · 579 unit and integration tests · 56 Playwright E2E
 tests · production build verified · zero vulnerabilities in production dependencies.**
 
 ---
@@ -104,7 +104,7 @@ For production, see [`docs/deployment.md`](docs/deployment.md).
 | **Knowledge base with RAG** | pgvector semantic retrieval over documents the tenant uploads — prices, cancellation policy, directions, FAQs. |
 | **GDPR-native** | Art. 15 export and Art. 17 deletion endpoints, audit logging, automatic PII redaction in logs, EU hosting, and a retention job that enforces the published policy. |
 | **Stripe + Italian SDI** | Subscriptions and Customer Portal, plus electronic invoicing for Italian B2B through Fatture in Cloud. |
-| **Multi-tenant by construction** | Row Level Security on all 22 tables, per-tenant WhatsApp credentials, tenant-scoped everything. |
+| **Multi-tenant by construction** | Row Level Security on all 23 tables, per-tenant WhatsApp credentials, tenant-scoped everything. |
 
 ---
 
@@ -124,7 +124,7 @@ For production, see [`docs/deployment.md`](docs/deployment.md).
 | Billing | **Stripe** + **Fatture in Cloud** | Subscriptions, Customer Portal, Italian SDI invoicing |
 | Rate limit | **Upstash Redis (EU)** | Named policies per endpoint |
 | Logging | **Pino** | Structured JSON with automatic PII redaction |
-| Testing | **Vitest 4** + **Playwright** | 544 unit/integration + 56 E2E |
+| Testing | **Vitest 4** + **Playwright** | 579 unit/integration + 56 E2E |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** | Pre-commit lint-staged, gitleaks in CI |
 
 ---
@@ -158,7 +158,7 @@ src/
 │   └── supabase/             server + admin clients
 ├── server/                   business logic — never imported by client components
 │   ├── ai/                   adapter, intent router, booking extractor, prompt composition
-│   ├── appointments/         booking, reminders
+│   ├── appointments/         booking, reminders, slot ranking, decision ledger
 │   ├── billing/              Stripe + Fatture in Cloud
 │   ├── conversations/        inbox, operator messages, escalation
 │   ├── gdpr/                 Art. 15 export, Art. 17 delete, retention
@@ -167,10 +167,53 @@ src/
 │   └── whatsapp/             service, repository, outbox, provisioning, voice pipeline
 └── middleware.ts             CSP nonce + COEP/COOP/CORP
 
-supabase/migrations/          22 tables, RLS on every one
-tests/                        544 unit + integration tests
+supabase/migrations/          23 tables, RLS on every one
+tests/                        579 unit + integration tests
 e2e/                          56 Playwright tests
 ```
+
+---
+
+## Deterministic slot ranking
+
+When a customer asks for an appointment, the bridge has to pick which three slots to offer. By
+default it offers the first three the availability engine returns. Behind
+`SCHEDULING_RANKING_ENABLED=true` it instead ranks the candidates it already has, and writes down
+why.
+
+**Where it applies.** The ranker currently runs on **initial booking slot proposals** only — the
+three slots offered when a customer first asks for an appointment. It does **not** yet rank
+**reschedule slot proposals**: when a customer moves an existing appointment, that flow still offers
+the first three available slots, unranked and unrecorded. Deliberate, not an oversight — the seam is
+the same shape and extending it is a small change, but it has not been made or tested here.
+
+The ranker ([`src/server/appointments/slot-ranking.ts`](src/server/appointments/slot-ranking.ts)) is
+a pure function: no database, no network, **no LLM**, and no reading of the system clock — the
+reference time is injected. The same candidates always produce the same order, whatever order they
+arrive in. Scores are integers, weights are explicit, and every slot carries structured reasons
+whose points sum exactly to its score.
+
+| Signal | Weight | Derived from |
+|---|---|---|
+| `requested_date_match` | 40 | the date window the extractor already parsed from the message |
+| `time_preference_match` | 30 | the requested day part (morning / afternoon / evening / explicit hour) |
+| `explicit_time_proximity` | up to 12, −4 per hour of distance | only for "at 15" / "after 15" requests — "before 15" is a limit, not a target |
+| `earliest_availability` | 24, −8 per calendar day | the slot's own start time versus the reference time |
+
+Ties break deterministically: score descending, then start time ascending, then a stable identity
+derived from the slot's own fields. Nothing depends on input order.
+
+Every ranked proposal is recorded in `scheduling_decisions` — the full candidate set in ranked
+order, with scores and reasons, plus a templated explanation. The first three candidates *are* the
+three offered, so there is no separate "selected" column to keep in sync. The write is fail-open: if
+the ledger is unavailable the failure is logged and the customer still gets their slots.
+
+What the ranker deliberately does **not** do: no technician routing, no customer history, no
+no-show prediction, no revenue optimisation. Those need data that does not exist at this seam, and
+inventing plumbing to fake them would be worse than leaving them out.
+
+The ranker, its structured reasons, the decision ledger and their tests are portfolio additions on
+top of the upstream MIT project — see [`ATTRIBUTION.md`](ATTRIBUTION.md).
 
 ---
 
@@ -178,7 +221,7 @@ e2e/                          56 Playwright tests
 
 Built for the European market, and the defaults reflect it.
 
-- **Row Level Security on all 22 tables**, verified by `npm run db:lint`, which derives the table list from the migrations themselves rather than a hand-maintained allowlist
+- **Row Level Security on all 23 tables**, verified by `npm run db:lint`, which derives the table list from the migrations themselves rather than a hand-maintained allowlist
 - **Webhook signature verification** with timing-safe comparison (Stripe over the raw body, WhatsApp shared secret)
 - **Credentials encrypted at rest** with AES-256-GCM — OAuth tokens and per-tenant WhatsApp API keys
 - **CSP nonce per request**, HSTS, COEP, COOP, CORP, `X-Frame-Options: DENY`
@@ -198,7 +241,7 @@ Proving isolation against a real Postgres in CI is the top priority for v0.3.
 ## Quality gate
 
 ```bash
-npm run verify   # typecheck + lint + 544 tests + RLS coverage
+npm run verify   # typecheck + lint + 579 tests + RLS coverage
 npm run build    # production build
 npm run test:e2e # 56 Playwright tests, no credentials required
 ```
@@ -308,6 +351,9 @@ Two house rules worth knowing before you open a PR:
 ## License
 
 MIT © [Christian Calabrò](https://github.com/Hiberius) — see [`LICENSE`](LICENSE).
+
+Portions of this repository are portfolio extensions built on top of that original work; see
+[`ATTRIBUTION.md`](ATTRIBUTION.md).
 
 ---
 

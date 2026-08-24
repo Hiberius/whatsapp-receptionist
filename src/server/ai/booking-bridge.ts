@@ -1,4 +1,6 @@
 import { AppError } from '@/lib/errors/app-error';
+import { env } from '@/lib/env';
+import { logger } from '@/lib/logging/logger';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import {
   RuleBasedBookingRequestExtractor,
@@ -14,6 +16,17 @@ import {
   type RescheduleAppointmentInput,
   type CancelAppointmentInput,
 } from '@/server/appointments/booking';
+import {
+  createSchedulingDecisionLedger,
+  toDecisionCandidates,
+  type SchedulingDecisionLedger,
+} from '@/server/appointments/decision-ledger';
+import {
+  SLOT_RANKING_VERSION,
+  buildRankingExplanation,
+  rankSlots,
+  type RankedSlot,
+} from '@/server/appointments/slot-ranking';
 import type { IntentCategory } from '@/server/ai/intent-router';
 
 export type BookingBridgeInput = {
@@ -148,12 +161,25 @@ type ConversationMetadataRow = {
 
 const bookingMetadataKey = 'ambrogioBooking';
 
+export type BookingBridgeOptions = {
+  rankingEnabled?: boolean;
+  decisionLedger?: SchedulingDecisionLedger;
+};
+
 export class BookingBridgeService {
+  private readonly rankingEnabled: boolean;
+
+  private readonly decisionLedger: SchedulingDecisionLedger;
+
   constructor(
     private readonly repository: BookingBridgeRepository,
     private readonly bookingService: AppointmentBookingService,
     private readonly extractor: BookingRequestExtractor = new RuleBasedBookingRequestExtractor(),
-  ) {}
+    options: BookingBridgeOptions = {},
+  ) {
+    this.rankingEnabled = options.rankingEnabled ?? env.SCHEDULING_RANKING_ENABLED;
+    this.decisionLedger = options.decisionLedger ?? createSchedulingDecisionLedger();
+  }
 
   async createBookingReply(input: BookingBridgeInput): Promise<BookingBridgeReply> {
     const timezone = await this.repository.getTenantTimezone(input.tenantId);
@@ -237,7 +263,15 @@ export class BookingBridgeService {
       now: input.occurredAt,
       maxSlots: shouldOverfetchForTimePreference(extracted) ? 20 : 3,
     });
-    const slots = filterSlotsByBookingRequest(rawSlots, extracted).slice(0, 3);
+    const candidates = filterSlotsByBookingRequest(rawSlots, extracted);
+    const ranked = this.rankingEnabled
+      ? rankSlots({ slots: candidates, request: extracted, now: input.occurredAt })
+      : null;
+    const slots = ranked ? ranked.slice(0, 3).map((entry) => entry.slot) : candidates.slice(0, 3);
+
+    if (ranked) {
+      await this.recordSchedulingDecision(input, extracted, ranked);
+    }
 
     if (slots.length === 0) {
       await this.repository.clearConversationBookingState({
@@ -288,6 +322,40 @@ export class BookingBridgeService {
         },
       },
     };
+  }
+
+  /**
+   * Registra la decisione di ranking, senza mai bloccare la conversazione.
+   *
+   * Il ledger e' un audit trail, non un passo del flusso di prenotazione: se la
+   * scrittura fallisce logghiamo e proseguiamo, perche' perdere una riga di
+   * audit e' meno grave che non rispondere al cliente.
+   */
+  private async recordSchedulingDecision(
+    input: BookingBridgeInput,
+    extracted: StructuredBookingRequest,
+    ranked: RankedSlot[],
+  ): Promise<void> {
+    try {
+      await this.decisionLedger.record({
+        tenantId: input.tenantId,
+        conversationId: input.conversationId,
+        request: serializeStructuredBookingRequest(extracted),
+        rankingVersion: SLOT_RANKING_VERSION,
+        candidates: toDecisionCandidates(ranked),
+        explanation: buildRankingExplanation(ranked),
+      });
+    } catch (error) {
+      logger.warn(
+        {
+          err: error,
+          tenantId: input.tenantId,
+          conversationId: input.conversationId,
+          rankingVersion: SLOT_RANKING_VERSION,
+        },
+        'Failed to persist scheduling decision',
+      );
+    }
   }
 
   private async confirmProposedSlot(

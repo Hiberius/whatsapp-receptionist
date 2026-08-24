@@ -45,8 +45,8 @@ Subscriptions · Upstash Redis · Playwright · Vitest · MIT license.
 | Frontend pages | 41 |
 | API routes | 41 |
 | Server-side domain modules | 16 |
-| Database tables (all with RLS) | 22 |
-| Unit + integration tests | **544** across 82 files |
+| Database tables (all with RLS) | 23 |
+| Unit + integration tests | **579** across 84 files |
 | End-to-end tests (Playwright) | **56** across 5 specs |
 | Lines of TypeScript in `src/` | ~39,700 |
 | Vulnerabilities in production dependencies | **0** |
@@ -148,7 +148,7 @@ filter from production code and confirming a test turns red. Before this change,
 filter left all 521 tests green.
 
 **Still open:** 24 server modules use the service-role client, which bypasses RLS. The policies
-exist on all 22 tables but are never exercised at runtime, and no CI job seeds two tenants against
+exist on all 23 tables but are never exercised at runtime, and no CI job seeds two tenants against
 a real Postgres and proves that A cannot read B. The application-level net is now real; the
 database-level proof is not.
 
@@ -251,7 +251,7 @@ Do not take this page on trust. Every number above is reproducible:
 git clone https://github.com/Hiberius/whatsapp-receptionist.git
 cd whatsapp-receptionist
 npm ci
-npm run verify          # typecheck + lint + 544 tests + RLS coverage check
+npm run verify          # typecheck + lint + 579 tests + RLS coverage check
 npm audit --omit=dev    # 0 vulnerabilities
 npm run build           # production build
 npx playwright install chromium && npm run test:e2e   # 56 E2E tests

@@ -12,7 +12,7 @@
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Anthropic Claude](https://img.shields.io/badge/Anthropic-Claude-D97757?logo=anthropic)](https://anthropic.com)
-[![Test](https://img.shields.io/badge/test-544%20+%2056%20E2E-brightgreen)](#quality-gate)
+[![Test](https://img.shields.io/badge/test-579%20+%2056%20E2E-brightgreen)](#quality-gate)
 [![Vulnerabilità produzione](https://img.shields.io/badge/vulnerabilit%C3%A0%20prod-0-brightgreen)](docs/SECURITY-AUDIT-NOTES.md)
 [![GDPR](https://img.shields.io/badge/GDPR-first-2563eb)](#gdpr--sicurezza)
 [![Stars](https://img.shields.io/github/stars/Hiberius/whatsapp-receptionist?style=social)](https://github.com/Hiberius/whatsapp-receptionist/stargazers)
@@ -50,7 +50,7 @@ quella vera. Il quadro completo, con i comandi per riprodurre ogni numero, è in
 | Livello | Stato |
 |---|---|
 | Servizi di dominio (`src/server/`) | **Reali.** Booking con disponibilità e vincolo GiST contro la doppia prenotazione, ciclo di vita abbonamenti Stripe, outbox WhatsApp con `FOR UPDATE SKIP LOCKED`, retry/backoff e dead-letter, idempotenza webhook, OAuth Google Calendar, RAG pgvector, GDPR Art. 15/17. |
-| Database (`supabase/migrations/`) | **Reale.** 22 tabelle, RLS su ognuna, `timestamptz` ovunque, importi in centesimi interi. |
+| Database (`supabase/migrations/`) | **Reale.** 23 tabelle, RLS su ognuna, `timestamptz` ovunque, importi in centesimi interi. |
 | Primitivi di sicurezza | **Reali.** Firma Stripe sul raw body, confronto timing-safe, state OAuth firmato HMAC e legato al tenant, AES-256-GCM sulle credenziali salvate, CSP con nonce. |
 | Registrazione self-service | **Funzionante.** Registrazione → magic link → `/auth/callback` → onboarding → dashboard, con guard su ogni segmento autenticato. |
 | Dashboard tenant | **Funzionante.** Dashboard, inbox conversazioni con risposta operatore, calendario, fatturazione, impostazioni WhatsApp, orari, servizi, personalità AI, knowledge base — tutto su dati reali del tenant. |
@@ -62,7 +62,7 @@ quella vera. Il quadro completo, con i comandi per riprodurre ogni numero, è in
 | Isolamento tenant | **Parzialmente provato.** I filtri di repository sono coperti da test che falliscono se un filtro `tenant_id` viene rimosso. La RLS in sé non viene ancora mai valutata a runtime. **È il punto aperto più importante.** |
 | Pannello admin cross-tenant | **Non collegato.** Quelle letture scavalcano la RLS e richiedono un servizio dedicato con test di isolamento. Le schermate lo dichiarano invece di mostrare dati inventati. |
 
-**41 pagine frontend · 41 route API · 22 tabelle · 544 test unitari e di integrazione · 56 test E2E
+**41 pagine frontend · 41 route API · 23 tabelle · 579 test unitari e di integrazione · 56 test E2E
 Playwright · build di produzione verificata · zero vulnerabilità nelle dipendenze di produzione.**
 
 ---
@@ -123,7 +123,7 @@ Per la produzione, vedi [`docs/deployment.md`](docs/deployment.md).
 | Fatturazione | **Stripe** + **Fatture in Cloud** | Abbonamenti, Customer Portal, fatturazione SDI |
 | Rate limit | **Upstash Redis (UE)** | Policy nominate per endpoint |
 | Logging | **Pino** | JSON strutturato con redazione automatica dei dati personali |
-| Testing | **Vitest 4** + **Playwright** | 544 unit/integrazione + 56 E2E |
+| Testing | **Vitest 4** + **Playwright** | 579 unit/integrazione + 56 E2E |
 | Tooling | **ESLint 9 flat** + **Prettier 3** + **Husky** | lint-staged in pre-commit, gitleaks in CI |
 
 ---
@@ -157,7 +157,7 @@ src/
 │   └── supabase/             client server + admin
 ├── server/                   logica di dominio — mai importata da componenti client
 │   ├── ai/                   adapter, intent router, estrattore booking, composizione prompt
-│   ├── appointments/         prenotazioni, promemoria
+│   ├── appointments/         prenotazioni, promemoria, ranking slot, decision ledger
 │   ├── billing/              Stripe + Fatture in Cloud
 │   ├── conversations/        inbox, messaggi operatore, escalation
 │   ├── gdpr/                 export Art. 15, cancellazione Art. 17, retention
@@ -166,8 +166,8 @@ src/
 │   └── whatsapp/             service, repository, outbox, provisioning, pipeline vocale
 └── middleware.ts             nonce CSP + COEP/COOP/CORP
 
-supabase/migrations/          22 tabelle, RLS su ognuna
-tests/                        544 test unitari e di integrazione
+supabase/migrations/          23 tabelle, RLS su ognuna
+tests/                        579 test unitari e di integrazione
 e2e/                          56 test Playwright
 ```
 
@@ -197,7 +197,7 @@ a runtime. Dimostrare l'isolamento contro un Postgres vero in CI è la priorità
 ## Quality gate
 
 ```bash
-npm run verify   # typecheck + lint + 544 test + copertura RLS
+npm run verify   # typecheck + lint + 579 test + copertura RLS
 npm run build    # build di produzione
 npm run test:e2e # 56 test Playwright, nessuna credenziale richiesta
 ```

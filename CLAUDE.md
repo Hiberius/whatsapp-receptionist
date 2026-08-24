@@ -12,7 +12,7 @@ Multi-tenant AI receptionist SaaS. Each tenant (dentist, beauty studio, gym, pro
 ./scripts/setup.sh       # First-time interactive wizard (env + deps + migrations)
 npm run dev              # Start dev server → http://localhost:3000
 npm run verify           # Quality gate: typecheck + lint + test + db:lint
-npm test                 # Run Vitest test suite (251 tests)
+npm test                 # Run Vitest test suite (`npm run verify` is the source of truth)
 ```
 
 ## Commands
@@ -70,7 +70,7 @@ src/
 │   └── env.ts            Zod-validated typed env (single source of truth)
 ├── server/               business logic — NEVER import in client components
 │   ├── ai/               Anthropic adapter, intent router, booking extractor, reply orchestrator
-│   ├── appointments/     booking service, reminder notifications
+│   ├── appointments/     booking service, reminder notifications, slot ranking, decision ledger
 │   ├── billing/          Stripe subscriptions, Fatture in Cloud SDI
 │   ├── calendar/         Google Calendar OAuth provider
 │   ├── gdpr/             Art.15 export, Art.17 delete with audit_log
@@ -79,7 +79,7 @@ src/
 ├── styles/               tokens.css + globals.css (CSS custom properties)
 └── middleware.ts          CSP nonce-based + COEP/COOP/CORP headers
 
-supabase/migrations/      7 SQL migrations (RLS on all 21 tables)
+supabase/migrations/      SQL migrations (RLS on every table — verified by `npm run db:lint`)
 tests/                    unit + integration tests (vitest, node env)
 scripts/                  setup wizard, seed dev data, RLS lint
 ```
