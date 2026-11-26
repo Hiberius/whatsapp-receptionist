@@ -113,6 +113,8 @@ Never edit a migration that has been applied to production. Always create a new 
 
 It runs as part of `npm run verify` and CI.
 
+On migration pull requests, [RattleCheck](../.github/workflows/rattlecheck.yml) compares the proposed SQL with the base branch and flags new high or critical permission findings, including overly broad column grants. It runs `rattlecheck@latest` on the SQL files and needs no database credentials.
+
 ## Indexes
 
 Indexes are added explicitly in migrations. Common patterns:
