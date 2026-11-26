@@ -1485,3 +1485,9 @@ Cosa Codex deve fare al rientro:
 Ownership tornata a Codex il 1 maggio 2026 (rientro previsto).
 
 — Claude Code
+
+## 2026-11-26 - Revisione dei permessi nelle PR con migrazioni
+
+- Aggiunto un controllo sulle modifiche ai permessi SQL prima del merge. Il controllo esistente `npm run db:lint` continua a verificare la copertura RLS.
+- Verificata la copertura statica sulle sette migrazioni del repository: 32 oggetti analizzabili.
+- Per provare il controllo su una PR, confrontare un grant di lettura ampio con un grant limitato alle colonne pubbliche.
